@@ -2,7 +2,7 @@
 
 ## Installation
 
-## macOS
+### macOS
 
 ```bash
 chmod +x ./installer.zsh && sh ./installer.sh
@@ -10,7 +10,7 @@ chmod +x ./installer.zsh && sh ./installer.sh
 
 ## Reinstall
 
-## macOS
+### macOS
 
 ```bash
 chmod +x ./uninstaller.sh && chmod +x ./installer.sh && sh ./uninstaller.sh && sh ./installer.sh
