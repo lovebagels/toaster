@@ -16,6 +16,6 @@ chmod +x ./installer.zsh && sh ./installer.sh
 chmod +x ./uninstaller.sh && chmod +x ./installer.sh && sh ./uninstaller.sh && sh ./installer.sh
 ```
 
-### Installing Dependencies
+## Installing Dependencies
 
 `pip3 install click atomicwrites requests tqdm GitPython toml`
