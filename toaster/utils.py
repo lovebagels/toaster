@@ -5,6 +5,7 @@ import requests
 import shutil
 from tqdm.auto import tqdm
 from git import RemoteProgress, Repo
+import platform
 
 
 def errecho(err, **kwargs):
@@ -35,6 +36,82 @@ def verify_file(file, hash):
         return True
 
     return False
+
+
+def get_val_for_sys(d, item, system):
+    i = None
+
+    if item in d[system]:
+        i = d[system]
+    elif type(d[system]) is list:
+        if len(d[system]) > 0:
+            i = d[system][0]
+
+    if item in i:
+        return i[item]
+
+
+def dependingonsys(d, item, append_mode=False):
+    if append_mode:
+        res = []
+    else:
+        res = None
+
+    if item in d:
+        if append_mode:
+            res += d[item]
+        else:
+            res = d[item]
+
+    if platform.system() == 'Linux':
+        if 'linux_any' in d:
+            ans = get_val_for_sys(d, item, 'linux_any')
+
+            if ans:
+                if append_mode:
+                    res += ans
+                else:
+                    res = ans
+
+        if not (platform.machine().startswith('arm') or platform.machine().startswith('aarch')):
+            if 'linux_x86_64' in d:
+                ans = get_val_for_sys(d, item, 'linux_x86_64')
+
+                if ans:
+                    if append_mode:
+                        res += ans
+                    else:
+                        res = ans
+    elif platform.system() == 'Darwin':
+        if 'universal' in d:
+            ans = get_val_for_sys(d, item, 'universal')
+
+            if ans:
+                if append_mode:
+                    res += ans
+                else:
+                    res = ans
+
+        if platform.machine() == 'arm64':
+            if 'arm64' in d:
+                ans = get_val_for_sys(d, item, 'arm64')
+
+                if ans:
+                    if append_mode:
+                        res += ans
+                    else:
+                        res = ans
+        else:
+            if 'x86_64' in d:
+                ans = get_val_for_sys(d, item, 'x86_64')
+
+                if ans:
+                    if append_mode:
+                        res += ans
+                    else:
+                        res = ans
+
+    return res
 
 
 class CloneProgress(RemoteProgress):

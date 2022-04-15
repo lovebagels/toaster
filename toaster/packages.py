@@ -8,7 +8,7 @@ import toml
 import subprocess
 from git import Repo
 from exceptions import *
-from utils import CloneProgress
+from utils import CloneProgress, dependingonsys
 from pathlib import Path
 import shutil
 
@@ -53,7 +53,7 @@ def install_package(package):
         if os.path.exists(repo_dir):
             raise AlreadyInstalled
 
-        git_url = package_toml['build']['repo']
+        git_url = dependingonsys(package_toml['build'], 'repo')
 
         if not git_url:
             raise Exception('No repo in TOML')
@@ -65,12 +65,23 @@ def install_package(package):
 
         os.chdir(repo_dir)
 
-        if 'make' in package_toml['build']:
-            for cmd in package_toml['build']['make']:
-                if 'make_sudo' in package_toml['build']:
+        # Run "pre_scripts"
+        if dependingonsys(package_toml['build'], 'pre_scripts', append_mode=True):
+            for cmd in dependingonsys(package_toml['build'], 'pre_scripts', append_mode=True):
+                subprocess.run(cmd)
+
+        # Run make commands
+        if dependingonsys(package_toml['build'], 'make', append_mode=True):
+            for cmd in dependingonsys(package_toml['build'], 'make', append_mode=True):
+                if dependingonsys(package_toml['build'], 'make_sudo'):
                     subprocess.run(['sudo', 'make'] + cmd)
                 else:
                     subprocess.run(['make'] + cmd)
+
+        # Run "post_scripts"
+        if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
+            for cmd in dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
+                subprocess.run(cmd)
 
         os.chdir(wd)
     else:
