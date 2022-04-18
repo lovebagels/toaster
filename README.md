@@ -4,11 +4,11 @@ A simple package manager for macOS/Linux with support for binary packages and ap
 
 ## Features and Goals
 
+- Git-based package management
 - Support binary packages and applications (.app packages)
-- Support built-in Python 3 (in macOS Monterey, which is Python 3.8 right now) 
+- Support built-in Python 3
 - Support x86_64 (x64) and ARM processors on both Linux and macOS
 - Manages system updates on macOS
-- Make it easy for users to add packages through the `toaster-users` source
 
 ## Installation
 
