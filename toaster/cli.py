@@ -1,6 +1,6 @@
 import click
-from packages import install_package, remove_package
 from utils import errecho, echo, secho
+from packages import install_package, remove_package
 from bakery import refresh_bakeries
 import sysupdates
 from exceptions import *

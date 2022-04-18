@@ -1,11 +1,11 @@
-from click import echo, secho
 import os
+import platform
 import hashlib
-import requests
 import shutil
+import requests
+from click import echo, secho
 from tqdm.auto import tqdm
 from git import RemoteProgress, Repo
-import platform
 
 
 def errecho(err, **kwargs):

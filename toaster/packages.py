@@ -2,23 +2,22 @@
 Code for handling packages
 """
 import os
-from asyncio import subprocess
-from bakery import get_all_packages
-import toml
-import subprocess
-from git import Repo
-from exceptions import *
-from utils import CloneProgress, dependingonsys, errecho, echo, secho
-from pathlib import Path
 import shutil
 import json
+import subprocess
+import toml
+from git import Repo
+from bakery import get_all_packages
+from utils import CloneProgress, dependingonsys, errecho, echo, secho
+from exceptions import *
 
 
 def remove_package(package):
     pkgs = get_all_packages()
     package_source = None
+    package_dir = os.path.join('/opt/toaster/packages', package)
 
-    if not os.path.exists(f'/opt/toaster/packages/{package}'):
+    if not os.path.exists(package_dir):
         raise NotFound
 
     for key in pkgs:
@@ -29,7 +28,7 @@ def remove_package(package):
         raise NotFound
 
     package_toml = toml.load(
-        f'/opt/toaster/bakery/{package_source}/{package}/{package}.toml')
+        os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
 
     # Run "pre_scripts"
     if dependingonsys(package_toml['build']['uninstall'], 'pre_scripts', append_mode=True):
@@ -44,12 +43,13 @@ def remove_package(package):
             else:
                 subprocess.run(['make'] + cmd)
 
+    if os.path.exists(package_dir):
+        shutil.rmtree(package_dir)
+
     # Run "post_scripts"
     if dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
         for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
             subprocess.run(cmd)
-
-    shutil.rmtree(f'/opt/toaster/packages/{package}')
 
 
 def install_package(package):
@@ -64,10 +64,10 @@ def install_package(package):
         raise NotFound
 
     package_toml = toml.load(
-        f'/opt/toaster/bakery/{package_source}/{package}/{package}.toml')
+        os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
 
     if 'build' in package_toml['types']:
-        repo_dir = f'/opt/toaster/packages/{package}'
+        repo_dir = os.path.join('/opt/toaster/packages', package)
 
         if os.path.exists(repo_dir):
             raise AlreadyInstalled
