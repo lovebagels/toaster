@@ -18,6 +18,9 @@ def remove_package(package):
     pkgs = get_all_packages()
     package_source = None
 
+    if not os.path.exists(f'/opt/toaster/packages/{package}'):
+        raise NotFound
+
     for key in pkgs:
         if package in pkgs[key]:
             package_source = key
@@ -46,10 +49,7 @@ def remove_package(package):
         for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
             subprocess.run(cmd)
 
-    if os.path.exists(f'/opt/toaster/packages/{package}'):
-        shutil.rmtree(f'/opt/toaster/packages/{package}')
-    else:
-        raise NotFound
+    shutil.rmtree(f'/opt/toaster/packages/{package}')
 
 
 def install_package(package):
