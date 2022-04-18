@@ -41,8 +41,6 @@ def install(packages):
             secho(
                 f'{package} installed!', fg='bright_green')
 
-            return True
-
 
 @click.command(help='Remove packages')
 @click.argument('packages', nargs=-1, required=True, type=str)
@@ -53,20 +51,8 @@ def remove(packages):
         try:
             remove_package(package)
         except NotFound:
+            success = False
             errecho(f'{package} is not installed.')
-        else:
-            return True
-
-
-@click.command(help='Reinstall packages')
-@click.argument('packages', nargs=-1, required=True, type=str)
-def reinstall(packages):
-    for package in packages:
-        secho(
-            f':: Reinstalling {package}...', fg='bright_magenta')
-
-        if remove([package]):
-            install([package])
 
 
 @click.command(help='Update packages')
@@ -78,8 +64,6 @@ def update(packages, refresh):
 
     if refresh:
         refresh_db()
-
-    # package_database = database['packages']
 
     if 'all' in packages:
         secho(
@@ -113,6 +97,5 @@ def update(packages, refresh):
 if __name__ == '__main__':
     cli.add_command(update)
     cli.add_command(install)
-    cli.add_command(reinstall)
     cli.add_command(remove)
     cli()
