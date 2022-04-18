@@ -1,11 +1,9 @@
 import click
-from exceptions import NotFound
 from packages import install_package, remove_package
 from utils import errecho, echo, secho
+from bakery import refresh_bakeries
 import sysupdates
 from exceptions import *
-
-package_database = {}
 
 
 @click.group()
@@ -17,6 +15,7 @@ def refresh_db():
     """Refresh database"""
     secho(
         ':: Refreshing repositories...', fg='bright_magenta')
+    refresh_bakeries()
     secho(
         'Repositories updated :)', fg='bright_green')
 
@@ -25,7 +24,6 @@ def refresh_db():
 @click.argument('packages', nargs=-1, required=True, type=str)
 def install(packages):
     for package in packages:
-        package_info = {}
         secho(
             f':: Installing {package}...', fg='bright_magenta')
 

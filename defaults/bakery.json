@@ -1,0 +1,13 @@
+{
+    "wxllow/core": {
+        "name":"core",
+        "description":"Core toaster packages!",
+        "maintainer":"wxllow",
+        "repo":"https://github.com/wxllow/core",
+        "packages":[
+            "go",
+            "snakesay",
+            "example"
+        ]
+    }
+}
