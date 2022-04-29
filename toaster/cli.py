@@ -1,7 +1,10 @@
+import sys
+from urllib.parse import urlparse
 import click
+import validators
 from utils import errecho, echo, secho
 from packages import install_package, remove_package
-from bakery import refresh_bakeries
+from bakery import refresh_bakeries, add_bakery
 import sysupdates
 from exceptions import *
 
@@ -11,19 +14,56 @@ def cli():
     pass
 
 
-def refresh_db():
+def refresh_db(auto=False):
     """Refresh database"""
+    msg = 'Refreshing bakeries...'
+
+    if auto:
+        msg = 'Automatically refreshing bakeries...'
     secho(
-        ':: Refreshing repositories...', fg='bright_magenta')
+        f':: {msg}', fg='bright_magenta')
     refresh_bakeries()
     secho(
-        'Repositories updated :)', fg='bright_green')
+        'Bakeries updated :)', fg='bright_green')
 
 
-@click.command(help='Install packages')
-@click.argument('packages', nargs=-1, required=True, type=str)
-def install(packages):
+@click.command(help='Add bakeries')
+@click.argument('bakeries', nargs=-1, required=True, type=str)
+def bakery(bakeries):
+    for bakery in bakeries:
+        if validators.url(bakery):
+            # Git url
+            name = '/'.join(urlparse(bakery).path.split(
+                '/')[-2:])
+            loc = bakery
+        elif len(bakery.split('/')) == 2:
+            # Github URL possibly
+            name = bakery
+            loc = f'https://github.com/{bakery}'
+        elif len(bakery.split(':')) > 1:
+            # Local file
+            name = bakery.split(':', maxsplit=2)[0]
+            loc = bakery.split(':', maxsplit=2)[1]
+        else:
+            return errecho(f"I don't know how to add {bakery} :(!")
+
+        name = name.replace('toaster-', '')
+
+        secho(
+            f':: Adding {name}...', fg='bright_magenta')
+        add_bakery(name, loc)
+        secho(f'Bakery {name} added!', fg='bright_green')
+
+
+@ click.command(help='Install packages')
+@ click.argument('packages', nargs=-1, required=True, type=str)
+@ click.option('--refresh', help='Refresh Packages', default=True, type=bool)
+def install(packages, refresh):
+
     for package in packages:
+        if refresh:
+            refresh_db(auto=True)
+
         secho(
             f':: Installing {package}...', fg='bright_magenta')
 
@@ -42,8 +82,8 @@ def install(packages):
                 f'{package} installed!', fg='bright_green')
 
 
-@click.command(help='Remove packages')
-@click.argument('packages', nargs=-1, required=True, type=str)
+@ click.command(help='Remove packages')
+@ click.argument('packages', nargs=-1, required=True, type=str)
 def remove(packages):
     for package in packages:
         secho(
@@ -52,18 +92,20 @@ def remove(packages):
             remove_package(package)
         except NotFound:
             success = False
-            errecho(f'{package} is not installed.')
+            return errecho(f'{package} is not installed.')
+
+        secho(
+            f'Removed {package}!', fg='bright_green')
 
 
-@click.command(help='Update packages')
-@click.argument('packages', nargs=-1, type=str)
-@click.option('--refresh', help='Refresh Packages', default=True, type=bool)
+@ click.command(help='Update packages')
+@ click.argument('packages', nargs=-1, type=str)
+@ click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def update(packages, refresh):
+    refresh_db()
+
     if not packages:
         packages = ['all']
-
-    if refresh:
-        refresh_db()
 
     if 'all' in packages:
         secho(
@@ -91,11 +133,13 @@ def update(packages, refresh):
         else:
             secho('All up to date! :)', fg='bright_green')
     else:
-        pass
+        if refresh:
+            refresh_db(auto=True)
 
 
 if __name__ == '__main__':
     cli.add_command(update)
     cli.add_command(install)
     cli.add_command(remove)
+    cli.add_command(bakery)
     cli()

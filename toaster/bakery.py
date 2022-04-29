@@ -1,14 +1,32 @@
 import os
 import json
+import shutil
 from atomicwrites import AtomicWriter
 from git import Repo
 import toml
-from utils import CloneProgress
+from exceptions import AlreadyInstalled
+from utils import CloneProgress, secho
 
 
 def get_database():
     with open(f'/opt/toaster/bakery.json', 'r') as f:
         return json.loads(f.read())
+
+
+def write_database(db):
+    with AtomicWriter('/opt/toaster/bakery.json', 'w', overwrite=True).open() as f:
+        f.write(json.dumps(db))
+
+
+def add_bakery(name, loc):
+    db = get_database()
+
+    if name in db:
+        secho(f'Bakery "{name}" exists, re-adding...', fg='yellow')
+    db[name] = {}
+    db[name]['repo'] = loc
+
+    write_database(db)
 
 
 def refresh_bakeries():
@@ -41,8 +59,7 @@ def refresh_bakeries():
 
         db[bakery]['packages'] = packages
 
-    with AtomicWriter('/opt/toaster/bakery.json', 'w', overwrite=True).open() as f:
-        f.write(json.dumps(db))
+    write_database(db)
 
 
 def get_all_packages():
