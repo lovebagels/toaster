@@ -30,26 +30,28 @@ def remove_package(package):
     package_toml = toml.load(
         os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
 
-    # Run scripts
-    if dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
-        for cmd in dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
-            subprocess.run(cmd)
+    if 'uninstall' in package_toml['build']:
+        # Run scripts
+        if dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
+            for cmd in dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
+                subprocess.run(cmd)
 
-    # Run make commands
-    if dependingonsys(package_toml['build']['uninstall'], 'make', append_mode=True):
-        for cmd in dependingonsys(package_toml['build']['uninstall'], 'make', append_mode=True):
-            if dependingonsys(package_toml['build']['uninstall'], 'make_sudo'):
-                subprocess.run(['sudo', 'make'] + cmd)
-            else:
-                subprocess.run(['make'] + cmd)
+        # Run make commands
+        if dependingonsys(package_toml['build']['uninstall'], 'make', append_mode=True):
+            for cmd in dependingonsys(package_toml['build']['uninstall'], 'make', append_mode=True):
+                if dependingonsys(package_toml['build']['uninstall'], 'make_sudo'):
+                    subprocess.run(['sudo', 'make'] + cmd)
+                else:
+                    subprocess.run(['make'] + cmd)
 
     if os.path.exists(package_dir):
         shutil.rmtree(package_dir)
 
-    # Run "post_scripts"
-    if dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
-        for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
-            subprocess.run(cmd)
+    if 'uninstall' in package_toml['build']:
+        # Run "post_scripts"
+        if dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
+            for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
+                subprocess.run(cmd)
 
 
 def install_package(package):
@@ -67,9 +69,10 @@ def install_package(package):
         os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
 
     if 'build' in package_toml['types']:
-        repo_dir = os.path.join('/opt/toaster/packages', package)
+        repo_dir = os.path.join('/opt/toaster/.cache', package)
+        package_dir = os.path.join('/opt/toaster/packages', package)
 
-        if os.path.exists(repo_dir):
+        if os.path.exists(package_dir):
             raise AlreadyInstalled
 
         git_url = dependingonsys(package_toml['build'], 'repo')
@@ -84,9 +87,23 @@ def install_package(package):
 
         os.chdir(repo_dir)
 
+        # Make package dir and package/bin dir
+        os.mkdir(package_dir)
+        os.mkdir(os.path.join(package_dir, 'bin'))
+
         # Run scripts
         if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
             for cmd in dependingonsys(package_toml['build'], 'scripts', append_mode=True):
+                # Format scripts
+                if dependingonsys(package_toml['build'], 'format_scripts'):
+                    cmdnew = []
+
+                    for i in cmd:
+                        cmdnew.append(
+                            i.format(prefix=f'/opt/toaster/packages/{package}'))
+
+                    cmd = cmdnew
+
                 subprocess.run(cmd)
 
         # Run make commands
@@ -95,14 +112,36 @@ def install_package(package):
 
         if dependingonsys(package_toml['build'], 'make', append_mode=True):
             for cmd in dependingonsys(package_toml['build'], 'make', append_mode=True):
+                # Format scripts
+                if dependingonsys(package_toml['build'], 'format_scripts'):
+                    cmdnew = []
+
+                    for i in cmd:
+                        cmdnew.append(
+                            i.format(prefix=f'/opt/toaster/packages/{package}'))
+
+                    cmd = cmdnew
+
                 if dependingonsys(package_toml['build'], 'make_sudo'):
                     subprocess.run(['sudo', 'make'] + cmd)
                 else:
                     subprocess.run(['make'] + cmd)
 
+        shutil.rmtree(repo_dir)
+
         # Run "post_scripts"
         if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
             for cmd in dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
+                # Format scripts
+                if dependingonsys(package_toml['build'], 'format_scripts'):
+                    cmdnew = []
+
+                    for i in cmd:
+                        cmdnew.append(
+                            i.format(prefix=f'/opt/toaster/packages/{package}'))
+
+                    cmd = cmdnew
+
                 subprocess.run(cmd)
 
         os.chdir(wd)
