@@ -9,7 +9,7 @@ class Error(Exception):
 
 
 class AlreadyInstalled(Error):
-    """Raised when a package is already installed"""
+    """Raised when a package or bakery is already installed"""
     pass
 
 
