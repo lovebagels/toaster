@@ -30,9 +30,9 @@ def remove_package(package):
     package_toml = toml.load(
         os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
 
-    # Run "pre_scripts"
-    if dependingonsys(package_toml['build']['uninstall'], 'pre_scripts', append_mode=True):
-        for cmd in dependingonsys(package_toml['build']['uninstall'], 'pre_scripts', append_mode=True):
+    # Run scripts
+    if dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
+        for cmd in dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
             subprocess.run(cmd)
 
     # Run make commands
@@ -84,9 +84,9 @@ def install_package(package):
 
         os.chdir(repo_dir)
 
-        # Run "pre_scripts"
-        if dependingonsys(package_toml['build'], 'pre_scripts', append_mode=True):
-            for cmd in dependingonsys(package_toml['build'], 'pre_scripts', append_mode=True):
+        # Run scripts
+        if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
+            for cmd in dependingonsys(package_toml['build'], 'scripts', append_mode=True):
                 subprocess.run(cmd)
 
         # Run make commands
