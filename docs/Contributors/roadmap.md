@@ -5,6 +5,7 @@ A list of things to do (for contributors)
 - [x] Properly implement sources ("bakery"), bakery configuration files, and bakery updates (actually get bakeries from git, store them, handle updates for them, and use them when installing/removing/updating packages)
 - [x] Implement custom bakery support (part of above)
 - [x] Actually install packages to correct directories
+- [ ] Better packages support (custom links)
 - [ ] Properly implement package updates
 - [ ] Support binaries
 - [ ] Implement hash checking
