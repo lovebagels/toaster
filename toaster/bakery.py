@@ -5,16 +5,19 @@ from atomicwrites import AtomicWriter
 from git import Repo
 import toml
 from exceptions import AlreadyInstalled
-from utils import CloneProgress, secho
+from utils import CloneProgress, where_is_toaster, secho
+
+
+toaster_loc = where_is_toaster()
 
 
 def get_database():
-    with open(f'~/.toaster/bakery.json', 'r') as f:
+    with open(os.path.join(toaster_loc, 'bakery.json'), 'r') as f:
         return json.loads(f.read())
 
 
 def write_database(db):
-    with AtomicWriter('~/.toaster/bakery.json', 'w', overwrite=True).open() as f:
+    with AtomicWriter(os.path.join(toaster_loc, 'bakery.json'), 'w', overwrite=True).open() as f:
         f.write(json.dumps(db))
 
 
@@ -34,7 +37,7 @@ def refresh_bakeries():
 
     for bakery in db:
         git_url = db[bakery]['repo']
-        repo_dir = os.path.join('~/.toaster/bakery', bakery)
+        repo_dir = os.path.join(toaster_loc, 'bakery', bakery)
 
         if os.path.exists(repo_dir):
             repo = Repo(repo_dir)

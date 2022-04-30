@@ -2,10 +2,15 @@ import os
 import platform
 import hashlib
 import shutil
+from pathlib import Path
 import requests
 from click import echo, secho
 from tqdm.auto import tqdm
 from git import RemoteProgress, Repo
+
+
+def where_is_toaster():
+    return os.path.join(str(Path.home()), '.toaster')
 
 
 def errecho(err, **kwargs):

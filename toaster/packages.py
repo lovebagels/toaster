@@ -1,21 +1,25 @@
 """
 Code for handling packages
 """
+from exceptions import *
+from utils import CloneProgress, dependingonsys, where_is_toaster, errecho, echo, secho
+from bakery import get_all_packages
+from git import Repo
 import os
 import shutil
 import json
 import subprocess
 import toml
-from git import Repo
-from bakery import get_all_packages
-from utils import CloneProgress, dependingonsys, errecho, echo, secho
-from exceptions import *
+from pathlib import Path
+
+
+toaster_loc = where_is_toaster()
 
 
 def remove_package(package):
     pkgs = get_all_packages()
     package_source = None
-    package_dir = os.path.join('~/.toaster/packages', package)
+    package_dir = os.path.join(toaster_loc, 'packages', package)
 
     if not os.path.exists(package_dir):
         raise NotFound
@@ -28,7 +32,7 @@ def remove_package(package):
         raise NotFound
 
     package_toml = toml.load(
-        os.path.join('~/.toaster/bakery', package_source, package, f'{package}.toml'))
+        os.path.join(toaster_loc, 'bakery', package_source, package, f'{package}.toml'))
 
     if 'uninstall' in package_toml['build']:
         # Run scripts
@@ -66,11 +70,11 @@ def install_package(package):
         raise NotFound
 
     package_toml = toml.load(
-        os.path.join('~/.toaster/bakery', package_source, package, f'{package}.toml'))
+        os.path.join(toaster_loc, 'bakery', package_source, package, f'{package}.toml'))
 
     if 'build' in package_toml['types']:
-        repo_dir = os.path.join('~/.toaster/.cache', package)
-        package_dir = os.path.join('~/.toaster/packages', package)
+        repo_dir = os.path.join(toaster_loc, '.cache', package)
+        package_dir = os.path.join(toaster_loc, 'packages', package)
 
         if os.path.exists(package_dir):
             raise AlreadyInstalled
@@ -89,6 +93,7 @@ def install_package(package):
 
         # Make package dir and package/bin dir
         os.mkdir(package_dir)
+        os.mkdir(os.path.join(package_dir, 'bin'))
 
         # Run scripts
         if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
@@ -127,6 +132,12 @@ def install_package(package):
                     subprocess.run(['make'] + cmd)
 
         shutil.rmtree(repo_dir)
+
+        # Link package binaries to toaster/bin
+        if os.path.isdir(os.path.join(package_dir, 'bin')):
+            for filename in os.listdir(os.path.join(package_dir, 'bin')):
+                os.symlink(os.path.join(package_dir, 'bin',
+                           filename), os.path.join(toaster_loc, 'bin', filename))
 
         # Run "post_scripts"
         if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
