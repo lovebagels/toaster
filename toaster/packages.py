@@ -15,7 +15,7 @@ from exceptions import *
 def remove_package(package):
     pkgs = get_all_packages()
     package_source = None
-    package_dir = os.path.join('/opt/toaster/packages', package)
+    package_dir = os.path.join('~/.toaster/packages', package)
 
     if not os.path.exists(package_dir):
         raise NotFound
@@ -28,7 +28,7 @@ def remove_package(package):
         raise NotFound
 
     package_toml = toml.load(
-        os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
+        os.path.join('~/.toaster/bakery', package_source, package, f'{package}.toml'))
 
     if 'uninstall' in package_toml['build']:
         # Run scripts
@@ -66,11 +66,11 @@ def install_package(package):
         raise NotFound
 
     package_toml = toml.load(
-        os.path.join('/opt/toaster/bakery', package_source, package, f'{package}.toml'))
+        os.path.join('~/.toaster/bakery', package_source, package, f'{package}.toml'))
 
     if 'build' in package_toml['types']:
-        repo_dir = os.path.join('/opt/toaster/.cache', package)
-        package_dir = os.path.join('/opt/toaster/packages', package)
+        repo_dir = os.path.join('~/.toaster/.cache', package)
+        package_dir = os.path.join('~/.toaster/packages', package)
 
         if os.path.exists(package_dir):
             raise AlreadyInstalled
@@ -89,7 +89,6 @@ def install_package(package):
 
         # Make package dir and package/bin dir
         os.mkdir(package_dir)
-        os.mkdir(os.path.join(package_dir, 'bin'))
 
         # Run scripts
         if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
@@ -100,7 +99,7 @@ def install_package(package):
 
                     for i in cmd:
                         cmdnew.append(
-                            i.format(prefix=f'/opt/toaster/packages/{package}'))
+                            i.format(prefix=package_dir))
 
                     cmd = cmdnew
 
@@ -118,7 +117,7 @@ def install_package(package):
 
                     for i in cmd:
                         cmdnew.append(
-                            i.format(prefix=f'/opt/toaster/packages/{package}'))
+                            i.format(prefix=package_dir))
 
                     cmd = cmdnew
 
@@ -137,8 +136,7 @@ def install_package(package):
                     cmdnew = []
 
                     for i in cmd:
-                        cmdnew.append(
-                            i.format(prefix=f'/opt/toaster/packages/{package}'))
+                        cmdnew.append(i.format(prefix=package_dir))
 
                     cmd = cmdnew
 

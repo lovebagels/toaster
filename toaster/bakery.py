@@ -9,12 +9,12 @@ from utils import CloneProgress, secho
 
 
 def get_database():
-    with open(f'/opt/toaster/bakery.json', 'r') as f:
+    with open(f'~/.toaster/bakery.json', 'r') as f:
         return json.loads(f.read())
 
 
 def write_database(db):
-    with AtomicWriter('/opt/toaster/bakery.json', 'w', overwrite=True).open() as f:
+    with AtomicWriter('~/.toaster/bakery.json', 'w', overwrite=True).open() as f:
         f.write(json.dumps(db))
 
 
@@ -34,7 +34,7 @@ def refresh_bakeries():
 
     for bakery in db:
         git_url = db[bakery]['repo']
-        repo_dir = os.path.join('/opt/toaster/bakery', bakery)
+        repo_dir = os.path.join('~/.toaster/bakery', bakery)
 
         if os.path.exists(repo_dir):
             repo = Repo(repo_dir)
