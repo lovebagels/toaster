@@ -135,9 +135,13 @@ def install_package(package):
 
         # Link package binaries to toaster/bin
         if os.path.isdir(os.path.join(package_dir, 'bin')):
-            for filename in os.listdir(os.path.join(package_dir, 'bin')):
-                os.symlink(os.path.join(package_dir, 'bin',
-                           filename), os.path.join(toaster_loc, 'bin', filename))
+            try:
+                for filename in os.listdir(os.path.join(package_dir, 'bin')):
+                    os.symlink(os.path.join(package_dir, 'bin', filename),
+                               os.path.join(toaster_loc, 'bin', filename))
+            except FileExistsError:
+                secho("1 or more links already exist and were not linked.",
+                      fg='bright_black')
 
         # Run "post_scripts"
         if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
