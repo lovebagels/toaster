@@ -1,0 +1,767 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.11">
+    
+    
+      
+        <title>Making a Package - Toaster</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8c5ef100.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.9647289d.min.css">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#making-a-package" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Toaster" class="md-header__button md-logo" aria-label="Toaster" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Toaster
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Making a Package
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Toaster" class="md-nav__button md-logo" aria-label="Toaster" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Toaster
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Toaster
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Contributors
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Contributors" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Contributors
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Contributors/roadmap/" class="md-nav__link">
+        Roadmap
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Package Maintainers
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Package Maintainers" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Package Maintainers
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Making a Package
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Making a Package
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#package-files" class="md-nav__link">
+    Package files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-information" class="md-nav__link">
+    Basic information
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-and-description" class="md-nav__link">
+    Name and Description
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version" class="md-nav__link">
+    Version
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archs-macos" class="md-nav__link">
+    Archs (macOS)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archs-linux" class="md-nav__link">
+    Archs (Linux)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types" class="md-nav__link">
+    Types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    Dependencies
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build" class="md-nav__link">
+    Build
+  </a>
+  
+    <nav class="md-nav" aria-label="Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#repository" class="md-nav__link">
+    Repository
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-scripts" class="md-nav__link">
+    Format Scripts?
+  </a>
+  
+    <nav class="md-nav" aria-label="Format Scripts?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scripts" class="md-nav__link">
+    Scripts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#make-scripts" class="md-nav__link">
+    Make Scripts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-scripts" class="md-nav__link">
+    Post-scripts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-specific-instructions" class="md-nav__link">
+    Platform-Specific Instructions
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#package-files" class="md-nav__link">
+    Package files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-information" class="md-nav__link">
+    Basic information
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-and-description" class="md-nav__link">
+    Name and Description
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version" class="md-nav__link">
+    Version
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archs-macos" class="md-nav__link">
+    Archs (macOS)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archs-linux" class="md-nav__link">
+    Archs (Linux)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#types" class="md-nav__link">
+    Types
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    Dependencies
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build" class="md-nav__link">
+    Build
+  </a>
+  
+    <nav class="md-nav" aria-label="Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#repository" class="md-nav__link">
+    Repository
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-scripts" class="md-nav__link">
+    Format Scripts?
+  </a>
+  
+    <nav class="md-nav" aria-label="Format Scripts?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scripts" class="md-nav__link">
+    Scripts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#make-scripts" class="md-nav__link">
+    Make Scripts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-scripts" class="md-nav__link">
+    Post-scripts
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-specific-instructions" class="md-nav__link">
+    Platform-Specific Instructions
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="making-a-package">Making a Package</h1>
+<p>So, there's an application you want to add to toaster? or maybe you're just curious? </p>
+<p>Well, either way, keep reading to know all you need to know about how toaster packages work.</p>
+<h2 id="package-files">Package files</h2>
+<p>Every package has a TOML file named after the package, which describes how the package should be installed and uninstalled. </p>
+<p>Here is an example of how a bakery (a git repo with packages in it) may be structured:</p>
+<pre><code class="language-tree">wxllow/toaster-core
+├── _toaster.toml
+├── coolexample
+│   └── coolexample.toml
+├── example
+    └── example.toml
+</code></pre>
+<h2 id="basic-information">Basic information</h2>
+<p>First in a package's TOML file is information like the name, version, license, dependencies, and which architectures/platforms it supports.</p>
+<p>Here is an example of how this may look:</p>
+<pre><code class="language-toml">name = 'example'
+desc = 'An example package.'
+version = '1.0.0'
+version_type = 'development'
+license = &quot;MIT&quot;
+archs = ['universal'] # Possible values: 'arm64', 'x86_64', 'universal'
+linux_archs = ['any'] # Possible values: 'any', 'x86_64'
+types = ['binary', 'build'] # Possible values: 'binary', 'build', 'app'
+dependencies = ['python&gt;3.8', 'go']
+</code></pre>
+<h3 id="name-and-description">Name and Description</h3>
+<p>The first 2 things here are the name and description, which are pretty self-explanatory. </p>
+<h3 id="version">Version</h3>
+<p>Next is the version and the version type. These can be any string, but we recommend using a semantic version number and having version_type either be <code>stable</code>, <code>development</code>, <code>prototype</code>,<code>beta</code>, <code>alpha</code>, or something along those lines</p>
+<h3 id="license">License</h3>
+<p>The license is pretty self-explanatory and can also be anything, but make sure that users are able to understand what the license means</p>
+<h3 id="archs-macos">Archs (macOS)</h3>
+<p>Here you can specify which architectures you wish to target on macOS, either <code>universal</code>, <code>arm64</code>, or <code>x86_64</code></p>
+<h3 id="archs-linux">Archs (Linux)</h3>
+<p>Here, you can specify which architectures you wish to target on Linux... either <code>any</code> or <code>x86_64</code></p>
+<h3 id="types">Types</h3>
+<p>This is where you specify which type(s) your package supports. This can be <code>build</code>, <code>binary</code>, or <code>app</code></p>
+<p><code>build</code> means an application that is built from source code</p>
+<p><code>binary</code> means a pre-built binary package</p>
+<p><code>app</code> means a GUI-only .app bundle <strong><em>(macOS only)</em></strong></p>
+<h3 id="dependencies">Dependencies</h3>
+<p>Here is where you can place all the other packages you require to be installed to install your package. You can specify just a package's name, like <code>go</code>, or a minimum version to be required for the package, like <code>python&gt;=3.7</code>.</p>
+<h2 id="build">Build</h2>
+<p>Here is an example</p>
+<pre><code class="language-toml">[build]
+repo = 'https://github.com/example/example' # git repo to install
+branch = 'master' # repo branch to use
+format_scripts = true # formats scripts and make with things like {prefix}
+scripts = [['echo', 'hello!']]
+make = [[], ['install']] # make commands
+post_scripts = [['echo', 'hello again!']]
+
+# Indentation is optional btw :)
+    [[build.universal]]
+    scripts = [['echo', 'hello, apple!']]
+    post_scripts = [['echo', 'hello again, apple!']]
+
+    [[build.uninstall]]
+    scripts = [['echo', 'bye bye!']]
+    post_scripts = [['echo', 'bye bye again!']]
+
+        [[build.uninstall.universal]]
+        scripts = [['echo', 'bye bye, apple!']]
+        post_scripts = [['echo', 'bye bye again, apple!']]
+</code></pre>
+<h3 id="repository">Repository</h3>
+<p>The first two items here tell toaster which Git repo to download the source code from and which branch of that repo to use.</p>
+<h2 id="format-scripts">Format Scripts?</h2>
+<p>This is a boolean which tells toaster whether it should format scripts with things like {prefix} which contain data, such as where the package should be installed, in the case of {prefix}.</p>
+<h3 id="scripts">Scripts</h3>
+<p>These are scripts to run during installation.</p>
+<p>This could be things like <code>./configure --prefix {prefix}</code></p>
+<p>This should be a list containing commands to run. Commands should also be a list, seperated by their arguments. For example, <code>[['./configure', '--prefix {prefix}']]</code>. This is for security reasons. If you have experience with for example the subprocess library on Python, you are likely already be familiar with this.</p>
+<h3 id="make-scripts">Make Scripts</h3>
+<p>These are scripts run after the other scripts that are just running <code>make</code></p>
+<p>This could be something like <code>[[], ['install']]</code> which would run <code>make</code> and <code>make install</code></p>
+<h3 id="post-scripts">Post-scripts</h3>
+<p>These are scripts that are run right before installation is finished. These work the same as regular scripts, just ran at a different time.</p>
+<h2 id="platform-specific-instructions">Platform-Specific Instructions</h2>
+<p>Platform/architecture specific instructions can be used. These will either overwrite their general values or append them (if the item is a list)</p>
+<p>For example:</p>
+<pre><code class="language-toml">    [[build.universal]]
+    scripts = [['echo', 'hello, apple!']]
+    post_scripts = [['echo', 'hello again, apple!']]
+
+    [[build.linux_any]]
+    scripts = [['echo', 'hello, tux!']]
+    post_scripts = [['echo', 'hello again, tux!']
+</code></pre>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../../Contributors/roadmap/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Roadmap" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Roadmap
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.748e2769.min.js"></script>
+      
+    
+  </body>
+</html>
