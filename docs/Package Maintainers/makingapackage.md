@@ -3,7 +3,7 @@
 So, there's an application you want to add to toaster? or maybe you're just curious? 
 
 Well, either way, keep reading to know all you need to know about how toaster packages work.
-
+ 
 ## Package files
 
 Every package has a TOML file named after the package, which describes how the package should be installed and uninstalled. 
