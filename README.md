@@ -28,4 +28,4 @@ sh ./uninstaller.sh && sh ./installer.sh
 
 ## Installing Dependencies
 
-`pip3 install click atomicwrites requests tqdm GitPython toml`
+`pip3 install atomicwrites click GitPython requests tqdm toml validators`
