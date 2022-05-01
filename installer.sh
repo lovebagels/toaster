@@ -11,6 +11,6 @@ cd ~/.toaster
 mkdir .cache apps bakery binaries bin packages
 
 echo "Adding toaster to path..."
-path+=~/.toaster/bin
+export PATH="~/.toaster/bin:$PATH"
 
 echo "Toaster has been installed! 🍞 :)"
