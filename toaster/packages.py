@@ -121,7 +121,8 @@ def install_package(package):
         shutil.rmtree(repo_dir)
 
         # Link package binaries to toaster/bin
-        link_dirs = dependingonsys(package_toml['build'], '', append_mode=True)
+        link_dirs = dependingonsys(
+            package_toml['build'], '', append_mode=True) or ['bin']
 
         try:
             for ld in link_dirs:
