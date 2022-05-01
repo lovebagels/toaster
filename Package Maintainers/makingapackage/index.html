@@ -386,29 +386,23 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#format-scripts" class="md-nav__link">
     Format Scripts?
   </a>
   
-    <nav class="md-nav" aria-label="Format Scripts?">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#scripts" class="md-nav__link">
-    Scripts
+  <a href="#link-dirs" class="md-nav__link">
+    Link dirs
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#make-scripts" class="md-nav__link">
-    Make Scripts
+  <a href="#scripts" class="md-nav__link">
+    Scripts
   </a>
   
 </li>
@@ -436,6 +430,54 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Users
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Users" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Users
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Users/gettingstarted/" class="md-nav__link">
+        Getting Started
+      </a>
     </li>
   
 
@@ -557,29 +599,23 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#format-scripts" class="md-nav__link">
     Format Scripts?
   </a>
   
-    <nav class="md-nav" aria-label="Format Scripts?">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#scripts" class="md-nav__link">
-    Scripts
+  <a href="#link-dirs" class="md-nav__link">
+    Link dirs
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#make-scripts" class="md-nav__link">
-    Make Scripts
+  <a href="#scripts" class="md-nav__link">
+    Scripts
   </a>
   
 </li>
@@ -663,12 +699,10 @@ dependencies = ['python&gt;3.8', 'go']
 <h2 id="build">Build</h2>
 <p>Here is an example</p>
 <pre><code class="language-toml">[build]
-repo = 'https://github.com/example/example' # git repo to install
-branch = 'master' # repo branch to use
-format_scripts = true # formats scripts and make with things like {prefix}
-scripts = [['echo', 'hello!']]
-make = [[], ['install']] # make commands
-post_scripts = [['echo', 'hello again!']]
+repo = 'https://github.com/foo/bar'
+branch = 'master'
+format_scripts = true
+scripts = [['./configure', '--prefix {prefix}'], [['make'], ['install']]]
 
 # Indentation is optional btw :)
     [[build.universal]]
@@ -676,26 +710,21 @@ post_scripts = [['echo', 'hello again!']]
     post_scripts = [['echo', 'hello again, apple!']]
 
     [[build.uninstall]]
-    scripts = [['echo', 'bye bye!']]
-    post_scripts = [['echo', 'bye bye again!']]
-
         [[build.uninstall.universal]]
         scripts = [['echo', 'bye bye, apple!']]
-        post_scripts = [['echo', 'bye bye again, apple!']]
 </code></pre>
 <h3 id="repository">Repository</h3>
 <p>The first two items here tell toaster which Git repo to download the source code from and which branch of that repo to use.</p>
-<h2 id="format-scripts">Format Scripts?</h2>
+<h3 id="format-scripts">Format Scripts?</h3>
 <p>This is a boolean which tells toaster whether it should format scripts with things like {prefix} which contain data, such as where the package should be installed, in the case of {prefix}.</p>
+<h3 id="link-dirs">Link dirs</h3>
+<p>List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to <code>['bin']</code></p>
 <h3 id="scripts">Scripts</h3>
-<p>These are scripts to run during installation.</p>
+<p>These are scripts to run during installation <strong>in the temp directory with the package's source code</strong>.</p>
 <p>This could be things like <code>./configure --prefix {prefix}</code></p>
-<p>This should be a list containing commands to run. Commands should also be a list, seperated by their arguments. For example, <code>[['./configure', '--prefix {prefix}']]</code>. This is for security reasons. If you have experience with for example the subprocess library on Python, you are likely already be familiar with this.</p>
-<h3 id="make-scripts">Make Scripts</h3>
-<p>These are scripts run after the other scripts that are just running <code>make</code></p>
-<p>This could be something like <code>[[], ['install']]</code> which would run <code>make</code> and <code>make install</code></p>
+<p>This should be a list containing commands to run. Commands should also be a list, seperated by their arguments. For example, <code>[['./configure', '--prefix {prefix}'], ['make', 'install']]</code>. This is for security reasons. If you have experience with for example the subprocess library on Python, you are likely already be familiar with this.</p>
 <h3 id="post-scripts">Post-scripts</h3>
-<p>These are scripts that are run right before installation is finished. These work the same as regular scripts, just ran at a different time.</p>
+<p>These are scripts that are run right before installation is finished and are ran in the project directory. These work the same as regular scripts, just ran at a different time and in a different directory.</p>
 <h2 id="platform-specific-instructions">Platform-Specific Instructions</h2>
 <p>Platform/architecture specific instructions can be used. These will either overwrite their general values or append them (if the item is a list)</p>
 <p>For example:</p>
@@ -734,6 +763,21 @@ post_scripts = [['echo', 'hello again!']]
           </div>
         </a>
       
+      
+        
+        <a href="../../Users/gettingstarted/" class="md-footer__link md-footer__link--next" aria-label="Next: Getting Started" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Getting Started
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
       
     </nav>
   
