@@ -59,6 +59,11 @@ def remove_package(package):
 
 
 def install_package(package):
+    try:
+        shutil.rmtree(os.path.join(toaster_loc, '.cache'))
+    except:
+        pass
+
     pkgs = get_all_packages()
     package_source = None
 
@@ -108,40 +113,29 @@ def install_package(package):
 
                     cmd = cmdnew
 
-                subprocess.run(cmd)
-
-        # Run make commands
-        if dependingonsys(package_toml['build'], 'make_sudo'):
-            secho(fg='bright_yellow')
-
-        if dependingonsys(package_toml['build'], 'make', append_mode=True):
-            for cmd in dependingonsys(package_toml['build'], 'make', append_mode=True):
-                # Format scripts
-                if dependingonsys(package_toml['build'], 'format_scripts'):
-                    cmdnew = []
-
-                    for i in cmd:
-                        cmdnew.append(
-                            i.format(prefix=package_dir))
-
-                    cmd = cmdnew
-
-                if dependingonsys(package_toml['build'], 'make_sudo'):
-                    subprocess.run(['sudo', 'make'] + cmd)
-                else:
-                    subprocess.run(['make'] + cmd)
+                try:
+                    subprocess.run(cmd)
+                except:
+                    print(f'error running: {cmd}')
 
         shutil.rmtree(repo_dir)
 
         # Link package binaries to toaster/bin
-        if os.path.isdir(os.path.join(package_dir, 'bin')):
-            try:
-                for filename in os.listdir(os.path.join(package_dir, 'bin')):
-                    os.symlink(os.path.join(package_dir, 'bin', filename),
-                               os.path.join(toaster_loc, 'bin', filename))
-            except FileExistsError:
-                secho("1 or more links already exist and were not linked.",
-                      fg='bright_black')
+        link_dirs = dependingonsys(package_toml['build'], '', append_mode=True)
+
+        try:
+            for ld in link_dirs:
+                ld = os.path.join(package_dir, ld)
+
+                if os.path.isdir(ld):
+                    for filename in os.listdir(ld):
+                        os.symlink(os.path.join(ld, filename),
+                                   os.path.join(toaster_loc, 'bin', filename))
+        except FileExistsError:
+            secho("1 or more links already exist and were not linked.",
+                  fg='bright_black')
+
+        os.chdir(package_dir)
 
         # Run "post_scripts"
         if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
