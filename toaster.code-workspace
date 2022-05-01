@@ -7,7 +7,7 @@
 		"path": "../toastercore"
 	},
 	{
-		"path": "../../../../../opt/toaster"
+		"path": "../../../.toaster"
 	}
 ],
   "settings": {
