@@ -77,12 +77,10 @@ Here is an example
 
 ```toml
 [build]
-repo = 'https://github.com/example/example' # git repo to install
-branch = 'master' # repo branch to use
-format_scripts = true # formats scripts and make with things like {prefix}
-scripts = [['echo', 'hello!']]
-make = [[], ['install']] # make commands
-post_scripts = [['echo', 'hello again!']]
+repo = 'https://github.com/foo/bar'
+branch = 'master'
+format_scripts = true
+scripts = [['./configure', '--prefix {prefix}'], [['make'], ['install']]]
 
 # Indentation is optional btw :)
     [[build.universal]]
@@ -90,39 +88,33 @@ post_scripts = [['echo', 'hello again!']]
     post_scripts = [['echo', 'hello again, apple!']]
 
     [[build.uninstall]]
-    scripts = [['echo', 'bye bye!']]
-    post_scripts = [['echo', 'bye bye again!']]
-
         [[build.uninstall.universal]]
         scripts = [['echo', 'bye bye, apple!']]
-        post_scripts = [['echo', 'bye bye again, apple!']]
 ```
 
 ### Repository
 
 The first two items here tell toaster which Git repo to download the source code from and which branch of that repo to use.
 
-## Format Scripts?
+### Format Scripts?
 
 This is a boolean which tells toaster whether it should format scripts with things like {prefix} which contain data, such as where the package should be installed, in the case of {prefix}.
 
+### Link dirs
+
+List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to `['bin']`
+
 ### Scripts
 
-These are scripts to run during installation.
+These are scripts to run during installation **in the temp directory with the package's source code**.
 
 This could be things like `./configure --prefix {prefix}`
 
-This should be a list containing commands to run. Commands should also be a list, seperated by their arguments. For example, `[['./configure', '--prefix {prefix}']]`. This is for security reasons. If you have experience with for example the subprocess library on Python, you are likely already be familiar with this.
-
-### Make Scripts
-
-These are scripts run after the other scripts that are just running `make`
-
-This could be something like `[[], ['install']]` which would run `make` and `make install`
+This should be a list containing commands to run. Commands should also be a list, seperated by their arguments. For example, `[['./configure', '--prefix {prefix}'], ['make', 'install']]`. This is for security reasons. If you have experience with for example the subprocess library on Python, you are likely already be familiar with this.
 
 ### Post-scripts
 
-These are scripts that are run right before installation is finished. These work the same as regular scripts, just ran at a different time.
+These are scripts that are run right before installation is finished and are ran in the project directory. These work the same as regular scripts, just ran at a different time and in a different directory.
 
 ## Platform-Specific Instructions
 
