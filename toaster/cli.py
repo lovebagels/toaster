@@ -1,13 +1,16 @@
 import sys
+from exceptions import *
 from urllib.parse import urlparse
+
+import validators
+
 import click
 from click_aliases import ClickAliasedGroup
-import validators
+
+import sysupdates
 from utils import errecho, echo, secho
 from packages import install_package, remove_package
 from bakery import refresh_bakeries, add_bakery, rm_bakery
-import sysupdates
-from exceptions import *
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -21,6 +24,7 @@ def refresh_db(auto=False):
 
     if auto:
         msg = 'Automatically refreshing bakeries...'
+
     secho(
         f':: {msg}', fg='bright_magenta')
     refresh_bakeries()

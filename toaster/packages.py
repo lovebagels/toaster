@@ -24,15 +24,8 @@ def remove_package(package):
     if not os.path.exists(package_dir):
         raise NotFound
 
-    for key in pkgs:
-        if package in pkgs[key]:
-            package_source = key
-
-    if not package_source:
-        raise NotFound
-
-    package_toml = toml.load(
-        os.path.join(toaster_loc, 'bakery', package_source, package, f'{package}.toml'))
+    package_toml = toml.load(os.path.join(
+        toaster_loc, 'package_data', f'{package}.toml'))
 
     if 'uninstall' in package_toml['build']:
         # Run scripts
@@ -74,8 +67,17 @@ def install_package(package):
     if not package_source:
         raise NotFound
 
-    package_toml = toml.load(
-        os.path.join(toaster_loc, 'bakery', package_source, package, f'{package}.toml'))
+    package_toml_loc = os.path.join(
+        toaster_loc, 'bakery', package_source, package, f'{package}.toml')
+
+    package_data_loc = os.path.join(
+        toaster_loc, 'package_data', f'{package}.toml')
+
+    # Copy package TOML to package_data for uninstall and in case bakery is removed
+    shutil.copyfile(package_toml_loc, package_data_loc)
+
+    package_toml = toml.load(os.path.join(
+        toaster_loc, 'bakery', package_source, package, f'{package}.toml'))
 
     if 'build' in package_toml['types']:
         repo_dir = os.path.join(toaster_loc, '.cache', package)
