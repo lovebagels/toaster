@@ -15,7 +15,7 @@ cp $PWD/defaults/bakery.json ~/.toaster/bakery.json
 
 echo "${GREY}Making subdirectories...${RED}"
 cd ~/.toaster
-mkdir .cache apps bakery binaries bin packages
+mkdir .cache apps bakery binaries bin packages package_data
 printf $RESET
 
 # Add toaster to path
