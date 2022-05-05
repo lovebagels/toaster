@@ -6,10 +6,10 @@ printf "${RED}Are you sure you want to uninstall toaster? (THIS WILL REMOVE ALL 
 read -r
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Toaster will not be not uninstalled!"
+    echo "${GREEN}Toaster will not be not uninstalled!${RESET}"
     exit 1
 fi
 
 echo "Uninstalling toaster... 😔"
 
-rm -r ~/.toaster
+rm -rf ~/.toaster
