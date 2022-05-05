@@ -1,15 +1,16 @@
 import sys
 from urllib.parse import urlparse
 import click
+from click_aliases import ClickAliasedGroup
 import validators
 from utils import errecho, echo, secho
 from packages import install_package, remove_package
-from bakery import refresh_bakeries, add_bakery
+from bakery import refresh_bakeries, add_bakery, rm_bakery
 import sysupdates
 from exceptions import *
 
 
-@click.group()
+@click.group(cls=ClickAliasedGroup)
 def cli():
     pass
 
@@ -27,7 +28,7 @@ def refresh_db(auto=False):
         'Bakeries updated :)', fg='bright_green')
 
 
-@click.command(help='Add bakeries')
+@cli.command(help='Add bakeries')
 @click.argument('bakeries', nargs=-1, required=True, type=str)
 def bakery(bakeries):
     for bakery in bakeries:
@@ -55,9 +56,42 @@ def bakery(bakeries):
         secho(f'Bakery {name} added!', fg='bright_green')
 
 
-@ click.command(help='Install packages')
-@ click.argument('packages', nargs=-1, required=True, type=str)
-@ click.option('--refresh', help='Refresh Packages', default=True, type=bool)
+@cli.command(help='Remove bakeries')
+@click.argument('bakeries', nargs=-1, required=True, type=str)
+def unbake(bakeries):
+    for bakery in bakeries:
+        if validators.url(bakery):
+            # Git url
+            name = '/'.join(urlparse(bakery).path.split(
+                '/')[-2:])
+            loc = bakery
+        elif len(bakery.split('/')) == 2:
+            # Github URL possibly
+            name = bakery
+            loc = f'https://github.com/{bakery}'
+        elif len(bakery.split(':')) > 1:
+            # Local file
+            name = bakery.split(':', maxsplit=2)[0]
+            loc = bakery.split(':', maxsplit=2)[1]
+        else:
+            return errecho(f"I don't know how to add {bakery} :(!")
+
+        name = name.replace('toaster-', '')
+
+        secho(
+            f':: Removing {name}...', fg='bright_magenta')
+
+        try:
+            rm_bakery(name, loc)
+        except KeyError:
+            return errecho(f"{name} doesn't exist.")
+
+        secho(f'Bakery {name} removed!', fg='bright_green')
+
+
+@cli.command(help='Install packages')
+@click.argument('packages', nargs=-1, required=True, type=str)
+@click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def install(packages, refresh):
 
     for package in packages:
@@ -82,8 +116,8 @@ def install(packages, refresh):
                 f'{package} installed!', fg='bright_green')
 
 
-@ click.command(help='Remove packages')
-@ click.argument('packages', nargs=-1, required=True, type=str)
+@cli.command(help='Remove packages', aliases=['uninstall'])
+@click.argument('packages', nargs=-1, required=True, type=str)
 def remove(packages):
     for package in packages:
         secho(
@@ -98,9 +132,9 @@ def remove(packages):
             f'Removed {package}!', fg='bright_green')
 
 
-@ click.command(help='Update packages')
-@ click.argument('packages', nargs=-1, type=str)
-@ click.option('--refresh', help='Refresh Packages', default=True, type=bool)
+@cli.command(help='Update packages')
+@click.argument('packages', nargs=-1, type=str)
+@click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def update(packages, refresh):
     refresh_db()
 

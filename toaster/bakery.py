@@ -1,3 +1,4 @@
+from asyncore import write
 import os
 import json
 import shutil
@@ -26,8 +27,20 @@ def add_bakery(name, loc):
 
     if name in db:
         secho(f'Bakery "{name}" exists, re-adding...', fg='yellow')
+
     db[name] = {}
     db[name]['repo'] = loc
+
+    write_database(db)
+
+
+def rm_bakery(name, loc):
+    db = get_database()
+
+    if not name in db:
+        raise KeyError(name)
+
+    del db[name]
 
     write_database(db)
 
