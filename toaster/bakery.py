@@ -6,22 +6,43 @@ from atomicwrites import AtomicWriter
 from git import Repo
 import toml
 from exceptions import AlreadyInstalled
-from utils import CloneProgress, where_is_toaster, secho
-
+from utils import CloneProgress, where_is_toaster, secho, errecho
+from filelock import Timeout, SoftFileLock
 
 toaster_loc = where_is_toaster()
+
+db_lock_file = os.path.join(toaster_loc, 'bakery.json.lock')
+db_lock = SoftFileLock(db_lock_file, timeout=1)
+
+
+def check_lock():
+    """Check if database file is locked"""
+    try:
+        db_lock.acquire()
+    except:
+        errecho(
+            f'Unable to unlock database.\nIf you are sure another toaster process is not running, you can remove {db_lock_file}')
+        exit(1)
 
 
 def get_database():
     """Reads the database from file"""
+    check_lock()
+
     with open(os.path.join(toaster_loc, 'bakery.json'), 'r') as f:
         return json.loads(f.read())
 
 
-def write_database(db):
+def write_database(db, release=True):
     """Overwrite the database with an updated one"""
+    check_lock()
+
     with AtomicWriter(os.path.join(toaster_loc, 'bakery.json'), 'w', overwrite=True).open() as f:
         f.write(json.dumps(db))
+
+    if release:
+        # Release lock
+        db_lock.release()
 
 
 def add_bakery(name, loc):
