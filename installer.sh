@@ -4,6 +4,8 @@ GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
 RESET='\033[0m' # No Color
 
+SOURCE_DIR=$PWD
+
 echo "${GREEN}:: Welcome to the toaster installer! 🍞"
 echo ":: This script will download and install toaster and add it to your path${RESET}"
 
@@ -38,5 +40,9 @@ else
 
     echo "${GREEN}Toaster was added to your path. Horray! 🎉${RESET}"
 fi
+
+# Link toaster itself to toaster PATH
+ln -sf $SOURCE_DIR/src/toaster/cli.py ~/.toaster/bin/toaster
+chmod +x ~/.toaster/bin/toaster
 
 echo "${GREEN}Toaster has been installed! 🍞 :)${RESET}"
