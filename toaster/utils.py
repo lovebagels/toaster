@@ -10,15 +10,17 @@ from git import RemoteProgress, Repo
 
 
 def where_is_toaster():
+    """Returns the directory toaster is installed in"""
     return os.path.join(str(Path.home()), '.toaster')
 
 
 def errecho(err, **kwargs):
+    """Echo an error message"""
     secho(err, fg='bright_red', **kwargs)
 
 
 def download_file(url):
-    # make an HTTP request within a context manager
+    """Download a file"""
     with requests.get(url, stream=True) as r:
         total_length = int(r.headers.get("Content-Length"))
 
@@ -43,7 +45,7 @@ def verify_file(file, hash):
     return False
 
 
-def get_val_for_sys(d, item, system):
+def _get_val_for_sys(d, item, system):
     i = None
 
     if item in d[system]:
@@ -57,6 +59,7 @@ def get_val_for_sys(d, item, system):
 
 
 def dependingonsys(d, item, append_mode=False):
+    """Get platform-specific values from a dict"""
     if append_mode:
         res = []
     else:
@@ -70,7 +73,7 @@ def dependingonsys(d, item, append_mode=False):
 
     if platform.system() == 'Linux':
         if 'linux_any' in d:
-            ans = get_val_for_sys(d, item, 'linux_any')
+            ans = _get_val_for_sys(d, item, 'linux_any')
 
             if ans:
                 if append_mode:
@@ -80,7 +83,7 @@ def dependingonsys(d, item, append_mode=False):
 
         if not (platform.machine().startswith('arm') or platform.machine().startswith('aarch')):
             if 'linux_x86_64' in d:
-                ans = get_val_for_sys(d, item, 'linux_x86_64')
+                ans = _get_val_for_sys(d, item, 'linux_x86_64')
 
                 if ans:
                     if append_mode:
@@ -89,7 +92,7 @@ def dependingonsys(d, item, append_mode=False):
                         res = ans
     elif platform.system() == 'Darwin':
         if 'universal' in d:
-            ans = get_val_for_sys(d, item, 'universal')
+            ans = _get_val_for_sys(d, item, 'universal')
 
             if ans:
                 if append_mode:
@@ -99,7 +102,7 @@ def dependingonsys(d, item, append_mode=False):
 
         if platform.machine() == 'arm64':
             if 'arm64' in d:
-                ans = get_val_for_sys(d, item, 'arm64')
+                ans = _get_val_for_sys(d, item, 'arm64')
 
                 if ans:
                     if append_mode:
@@ -108,7 +111,7 @@ def dependingonsys(d, item, append_mode=False):
                         res = ans
         else:
             if 'x86_64' in d:
-                ans = get_val_for_sys(d, item, 'x86_64')
+                ans = _get_val_for_sys(d, item, 'x86_64')
 
                 if ans:
                     if append_mode:
@@ -120,6 +123,8 @@ def dependingonsys(d, item, append_mode=False):
 
 
 class CloneProgress(RemoteProgress):
+    """Progress bar for git cloning"""
+
     def __init__(self, package, url):
         super().__init__()
         self.pbar = tqdm(desc=f'Cloning {url}...')
