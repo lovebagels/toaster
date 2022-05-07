@@ -175,9 +175,13 @@ def update(packages, refresh):
             refresh_db(auto=True)
 
 
-if __name__ == '__main__':
+def main():
     cli.add_command(update)
     cli.add_command(install)
     cli.add_command(remove)
     cli.add_command(bakery)
     cli()
+
+
+if __name__ == '__main__':
+    main()
