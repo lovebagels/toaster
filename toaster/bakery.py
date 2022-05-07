@@ -13,16 +13,19 @@ toaster_loc = where_is_toaster()
 
 
 def get_database():
+    """Reads the database from file"""
     with open(os.path.join(toaster_loc, 'bakery.json'), 'r') as f:
         return json.loads(f.read())
 
 
 def write_database(db):
+    """Overwrite the database with an updated one"""
     with AtomicWriter(os.path.join(toaster_loc, 'bakery.json'), 'w', overwrite=True).open() as f:
         f.write(json.dumps(db))
 
 
 def add_bakery(name, loc):
+    """Adds a bakery"""
     db = get_database()
 
     if name in db:
@@ -35,6 +38,7 @@ def add_bakery(name, loc):
 
 
 def rm_bakery(name, loc):
+    """Removes a bakery"""
     db = get_database()
 
     if not name in db:
@@ -46,6 +50,7 @@ def rm_bakery(name, loc):
 
 
 def refresh_bakeries():
+    """Refreshes all bakeries"""
     db = get_database()
 
     for bakery in db:
@@ -79,6 +84,7 @@ def refresh_bakeries():
 
 
 def get_all_packages():
+    """Returns a list of all available packages"""
     db = get_database()
     pkgl = {}
 
