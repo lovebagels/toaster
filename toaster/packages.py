@@ -16,7 +16,19 @@ from pathlib import Path
 toaster_loc = where_is_toaster()
 
 
+def clean_symlinks():
+    """Cleans left over symbolic links from uninstalled/updated packages"""
+    bin_dir = os.path.join(toaster_loc, 'bin')
+
+    for filename in os.listdir(bin_dir):
+        file = os.path.join(bin_dir, filename)
+
+        if not os.path.exists(os.readlink(file)):
+            os.remove(file)
+
+
 def remove_package(package):
+    """Remove/uninstall a package"""
     pkgs = get_all_packages()
     package_source = None
     package_dir = os.path.join(toaster_loc, 'packages', package)
@@ -50,8 +62,12 @@ def remove_package(package):
             for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
                 subprocess.run(cmd)
 
+    # Delete broken symlinks
+    clean_symlinks()
+
 
 def install_package(package):
+    """Install a package"""
     try:
         shutil.rmtree(os.path.join(toaster_loc, '.cache'))
     except:
