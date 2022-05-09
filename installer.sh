@@ -20,23 +20,14 @@ cd ~/.toaster
 mkdir .cache apps bakery binaries bin packages package_data
 printf $RESET
 
-# Add toaster to path
-if [ -n "$ZSH_VERSION" ]; then
-    RC="$HOME/.zshrc"
-    SHELLTYPE="zsh"
-else
-    RC="$HOME/.bashrc"
-    SHELLTYPE="bash"
-fi
-
-source $RC
-
 if [[ "$PATH" =~ (^|:)"$HOME/.toaster/bin"(:|$) ]]; then
     echo "${YELLOW}Toaster is already in your path. Horray! 🎉${RESET}"
 else
-    echo "Adding toaster to your $SHELLTYPE path..."
-    echo '\n# Add toaster to path :)\nexport PATH="$HOME/.toaster/bin:$PATH"\n' >>$RC
-    source $RC
+    echo "Adding toaster to your path..."
+
+    pathexport='\n# Add toaster to path :)\nexport PATH="$HOME/.toaster/bin:$PATH"\n'
+    echo $pathexport >>~/.zshrc
+    echo $pathexport >>~/.bashrc
 
     echo "${GREEN}Toaster was added to your path. Horray! 🎉${RESET}"
 fi
@@ -46,3 +37,5 @@ ln -sf $SOURCE_DIR/src/toaster/cli.py ~/.toaster/bin/toaster
 chmod +x ~/.toaster/bin/toaster
 
 echo "${GREEN}Toaster has been installed! 🍞 :)${RESET}"
+
+cd $PWD
