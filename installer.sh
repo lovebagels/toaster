@@ -38,7 +38,7 @@ else
 fi
 
 echo "${GREY}Copying default bakeries....${RED}"
-cp $PWD/defaults/bakery.json ~/.toaster/bakery.json
+cp $SOURCE_DIR/defaults/bakery.json ~/.toaster/bakery.json
 
 echo "${GREY}Making subdirectories...${RED}"
 cd ~/.toaster
