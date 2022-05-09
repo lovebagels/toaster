@@ -18,12 +18,12 @@ A simple package manager for macOS/Linux with support for binary packages and ap
 sh ./installer.sh
 ```
 
-## Reinstall
+## Uninstall
 
-### macOS
+***THIS WILL REMOVE ALL YOUR INSTALLED PACKAGES***
 
 ```bash
-sh ./uninstaller.sh && sh ./installer.sh
+sh ./uninstaller.sh
 ```
 
 ## Installing Dependencies
