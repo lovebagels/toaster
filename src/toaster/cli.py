@@ -61,7 +61,7 @@ def cli():
 
 
 def refresh_db(auto=False):
-    """Refresh database"""
+    """Refresh bakeries (this is for commands to use)"""
     msg = 'Refreshing bakeries...'
 
     if auto:
@@ -76,12 +76,14 @@ def refresh_db(auto=False):
 
 @cli.command(help='Refresh bakeries', group='Bakeries')
 def refresh():
+    """Refresh bakeries"""
     refresh_db()
 
 
 @cli.command(help='Add bakeries', group='Bakeries')
 @click.argument('bakeries', nargs=-1, required=True, type=str)
 def bakery(bakeries):
+    """Add a bakery"""
     for bakery in bakeries:
         if validators.url(bakery):
             # Git url
@@ -110,6 +112,7 @@ def bakery(bakeries):
 @cli.command(help='Remove bakeries', group='Bakeries')
 @click.argument('bakeries', nargs=-1, required=True, type=str)
 def unbake(bakeries):
+    """Remove a bakery"""
     for bakery in bakeries:
         if validators.url(bakery):
             # Git url
@@ -144,11 +147,11 @@ def unbake(bakeries):
 @click.argument('packages', nargs=-1, required=True, type=str)
 @click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def install(packages, refresh):
+    """Install a package"""
+    if refresh:
+        refresh_db(auto=True)
 
     for package in packages:
-        if refresh:
-            refresh_db(auto=True)
-
         secho(
             f':: Installing {package}...', fg='bright_magenta')
 
@@ -170,6 +173,7 @@ def install(packages, refresh):
 @cli.command(help='Remove packages', aliases=['uninstall'], group='Packages')
 @click.argument('packages', nargs=-1, required=True, type=str)
 def remove(packages):
+    """Remove a package"""
     for package in packages:
         secho(
             f':: Remoivng {package}...', fg='bright_magenta')
@@ -187,10 +191,11 @@ def remove(packages):
 @click.argument('packages', nargs=-1, type=str)
 @click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def update(packages, refresh):
-
+    """Update a package"""
     if not packages:
         packages = ['all']
 
+    # Update all
     if 'all' in packages:
         refresh_db()
 
@@ -221,10 +226,11 @@ def update(packages, refresh):
 
         return
 
-    for package in packages:
-        if refresh:
-            refresh_db(auto=True)
+    # Update packages
+    if refresh:
+        refresh_db(auto=True)
 
+    for package in packages:
         secho(
             f':: Installing {package}...', fg='bright_magenta')
 
@@ -243,9 +249,5 @@ def update(packages, refresh):
                 f'{package} updated!', fg='bright_green')
 
 
-def main():
-    cli()
-
-
 if __name__ == '__main__':
-    main()
+    cli()
