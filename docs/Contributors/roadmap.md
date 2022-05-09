@@ -8,9 +8,12 @@ A list of things to do (for contributors)
 - [x] Implement custom bakery support (part of above)
 - [x] Actually install packages to correct directories
 - [x] Better packages support (custom links)
-- [ ] Properly implement package updates
+- [x] Lock database
+- [x] Clean-up install package function
+- [x] Properly implement package updates
 - [ ] Support binaries
 - [ ] Implement hash checking
+- [ ] Safer package updates
 - [ ] Clean up any bad code/comments
 - [ ] *See **Making installer***
 - [ ] **MILESTONE #1: Support "apps"**
