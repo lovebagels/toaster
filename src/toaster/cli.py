@@ -10,7 +10,7 @@ from click_aliases import ClickAliasedGroup
 
 import sysupdates
 from utils import errecho, echo, secho
-from packages import install_package, remove_package
+from packages import install_package, remove_package, update_package
 from bakery import refresh_bakeries, add_bakery, rm_bakery
 
 
@@ -172,8 +172,26 @@ def update(packages, refresh):
         else:
             secho('All up to date! :)', fg='bright_green')
     else:
-        if refresh:
-            refresh_db(auto=True)
+        for package in packages:
+            if refresh:
+                refresh_db(auto=True)
+
+            secho(
+                f':: Installing {package}...', fg='bright_magenta')
+
+            try:
+                update_package(package)
+            except NotFound:
+                errecho(f'{package} is not installed.')
+            except AlreadyInstalled:
+                secho(
+                    f'{package} is already up to date :).', fg='bright_green')
+            except NotImplementedError:
+                errecho(
+                    f'{package} was found but is not available because it is a binary or app which is not supported yet.')
+            else:
+                secho(
+                    f'{package} updated!', fg='bright_green')
 
 
 def main():

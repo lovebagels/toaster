@@ -1,6 +1,7 @@
 """
 Code for handling packages
 """
+from ast import If
 from exceptions import *
 from utils import CloneProgress, dependingonsys, where_is_toaster, errecho, echo, secho
 from bakery import get_all_packages
@@ -66,6 +67,75 @@ def remove_package(package):
     clean_symlinks()
 
 
+def build_package(repo_dir, package_dir, package_toml, link_warn=True, update=False):
+    wd = os.getcwd()
+
+    os.chdir(repo_dir)
+
+    if update:
+        if os.path.exists(package_dir):
+            shutil.rmtree(package_dir)
+
+    # Make package dir and package/bin dir
+    os.mkdir(package_dir)
+    os.mkdir(os.path.join(package_dir, 'bin'))
+
+    # Run scripts
+    if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
+        for cmd in dependingonsys(package_toml['build'], 'scripts', append_mode=True):
+            # Format scripts
+            if dependingonsys(package_toml['build'], 'format_scripts'):
+                cmdnew = []
+
+                for i in cmd:
+                    cmdnew.append(
+                        i.format(prefix=package_dir))
+
+                cmd = cmdnew
+
+            try:
+                subprocess.run(cmd)
+            except:
+                print(f'error running: {cmd}')
+
+    shutil.rmtree(repo_dir)
+
+    # Link package binaries to toaster/bin
+    link_dirs = dependingonsys(
+        package_toml['build'], '', append_mode=True) or ['bin']
+
+    try:
+        for ld in link_dirs:
+            ld = os.path.join(package_dir, ld)
+
+            if os.path.isdir(ld):
+                for filename in os.listdir(ld):
+                    os.symlink(os.path.join(ld, filename),
+                               os.path.join(toaster_loc, 'bin', filename))
+    except FileExistsError:
+        if link_warn:
+            secho("1 or more links already exist and were not linked.",
+                  fg='bright_black')
+
+    os.chdir(package_dir)
+
+    # Run "post_scripts"
+    if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
+        for cmd in dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
+            # Format scripts
+            if dependingonsys(package_toml['build'], 'format_scripts'):
+                cmdnew = []
+
+                for i in cmd:
+                    cmdnew.append(i.format(prefix=package_dir))
+
+                cmd = cmdnew
+
+            subprocess.run(cmd)
+
+    os.chdir(wd)
+
+
 def install_package(package):
     """Install a package"""
     try:
@@ -92,8 +162,7 @@ def install_package(package):
     # Copy package TOML to package_data for uninstall and in case bakery is removed
     shutil.copyfile(package_toml_loc, package_data_loc)
 
-    package_toml = toml.load(os.path.join(
-        toaster_loc, 'bakery', package_source, package, f'{package}.toml'))
+    package_toml = toml.load(package_toml_loc)
 
     if 'build' in package_toml['types']:
         repo_dir = os.path.join(toaster_loc, '.cache', package)
@@ -110,66 +179,55 @@ def install_package(package):
         Repo.clone_from(git_url, repo_dir,
                         progress=CloneProgress(package, git_url))
 
-        wd = os.getcwd()
+        build_package(repo_dir, package_dir, package_toml)
+    else:
+        raise NotImplementedError
 
-        os.chdir(repo_dir)
 
-        # Make package dir and package/bin dir
-        os.mkdir(package_dir)
-        os.mkdir(os.path.join(package_dir, 'bin'))
+def update_package(package):
+    """Update a package"""
+    pkgs = get_all_packages()
+    package_source = None
 
-        # Run scripts
-        if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
-            for cmd in dependingonsys(package_toml['build'], 'scripts', append_mode=True):
-                # Format scripts
-                if dependingonsys(package_toml['build'], 'format_scripts'):
-                    cmdnew = []
+    for key in pkgs:
+        if package in pkgs[key]:
+            package_source = key
 
-                    for i in cmd:
-                        cmdnew.append(
-                            i.format(prefix=package_dir))
+    if not package_source:
+        raise NotFound
 
-                    cmd = cmdnew
+    package_toml_loc = os.path.join(
+        toaster_loc, 'bakery', package_source, package, f'{package}.toml')
 
-                try:
-                    subprocess.run(cmd)
-                except:
-                    print(f'error running: {cmd}')
+    package_data_loc = os.path.join(
+        toaster_loc, 'package_data', f'{package}.toml')
 
-        shutil.rmtree(repo_dir)
+    package_toml = toml.load(package_toml_loc)
 
-        # Link package binaries to toaster/bin
-        link_dirs = dependingonsys(
-            package_toml['build'], '', append_mode=True) or ['bin']
+    package_data_toml = toml.load(package_data_loc)
 
-        try:
-            for ld in link_dirs:
-                ld = os.path.join(package_dir, ld)
+    if package_data_toml.get('version', None) == package_toml.get('version', None):
+        raise AlreadyInstalled('Already up to date!')
 
-                if os.path.isdir(ld):
-                    for filename in os.listdir(ld):
-                        os.symlink(os.path.join(ld, filename),
-                                   os.path.join(toaster_loc, 'bin', filename))
-        except FileExistsError:
-            secho("1 or more links already exist and were not linked.",
-                  fg='bright_black')
+    if 'build' in package_toml['types']:
+        repo_dir = os.path.join(toaster_loc, '.cache', package)
+        package_dir = os.path.join(toaster_loc, 'packages', package)
 
-        os.chdir(package_dir)
+        if not os.path.exists(package_dir):
+            raise NotFound
 
-        # Run "post_scripts"
-        if dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
-            for cmd in dependingonsys(package_toml['build'], 'post_scripts', append_mode=True):
-                # Format scripts
-                if dependingonsys(package_toml['build'], 'format_scripts'):
-                    cmdnew = []
+        git_url = dependingonsys(package_toml['build'], 'repo')
 
-                    for i in cmd:
-                        cmdnew.append(i.format(prefix=package_dir))
+        if not git_url:
+            raise Exception('No repo in TOML')
 
-                    cmd = cmdnew
+        Repo.clone_from(git_url, repo_dir,
+                        progress=CloneProgress(package, git_url))
 
-                subprocess.run(cmd)
+        # Copy package TOML to package_data for uninstall and in case bakery is removed
+        shutil.copyfile(package_toml_loc, package_data_loc)
 
-        os.chdir(wd)
+        build_package(repo_dir, package_dir, package_toml,
+                      link_warn=True, update=True)
     else:
         raise NotImplementedError
