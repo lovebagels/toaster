@@ -14,7 +14,48 @@ from packages import install_package, remove_package, update_package
 from bakery import refresh_bakeries, add_bakery, rm_bakery
 
 
-@click.group(cls=ClickAliasedGroup)
+# https://stackoverflow.com/a/58770064
+class GroupedGroup(ClickAliasedGroup):
+    def command(self, *args, **kwargs):
+        """Gather the command help groups"""
+        help_group = kwargs.pop('group', None)
+        decorator = super(GroupedGroup, self).command(*args, **kwargs)
+
+        def wrapper(f):
+            cmd = decorator(f)
+            cmd.help_group = help_group
+            return cmd
+
+        return wrapper
+
+    def format_commands(self, ctx, formatter):
+        # Modified fom the base class method
+
+        commands = []
+        for subcommand in self.list_commands(ctx):
+            cmd = self.get_command(ctx, subcommand)
+            if not (cmd is None or cmd.hidden):
+                commands.append((subcommand, cmd))
+
+        if commands:
+            longest = max(len(cmd[0]) for cmd in commands)
+            # allow for 3 times the default spacing
+            limit = formatter.width - 6 - longest
+
+            groups = {}
+            for subcommand, cmd in commands:
+                help_str = cmd.get_short_help_str(limit)
+                subcommand += ' ' * (longest - len(subcommand))
+                groups.setdefault(
+                    cmd.help_group, []).append((subcommand, help_str))
+
+            with formatter.section('Commands'):
+                for group_name, rows in groups.items():
+                    with formatter.section(group_name or 'Other'):
+                        formatter.write_dl(rows)
+
+
+@click.group(cls=GroupedGroup)
 def cli():
     pass
 
@@ -33,7 +74,12 @@ def refresh_db(auto=False):
         'Bakeries updated :)', fg='bright_green')
 
 
-@cli.command(help='Add bakeries')
+@cli.command(help='Refresh bakeries', group='Bakeries')
+def refresh():
+    refresh_db()
+
+
+@cli.command(help='Add bakeries', group='Bakeries')
 @click.argument('bakeries', nargs=-1, required=True, type=str)
 def bakery(bakeries):
     for bakery in bakeries:
@@ -61,7 +107,7 @@ def bakery(bakeries):
         secho(f'Bakery {name} added!', fg='bright_green')
 
 
-@cli.command(help='Remove bakeries')
+@cli.command(help='Remove bakeries', group='Bakeries')
 @click.argument('bakeries', nargs=-1, required=True, type=str)
 def unbake(bakeries):
     for bakery in bakeries:
@@ -94,7 +140,7 @@ def unbake(bakeries):
         secho(f'Bakery {name} removed!', fg='bright_green')
 
 
-@cli.command(help='Install packages')
+@cli.command(help='Install packages', group='Packages')
 @click.argument('packages', nargs=-1, required=True, type=str)
 @click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def install(packages, refresh):
@@ -121,7 +167,7 @@ def install(packages, refresh):
                 f'{package} installed!', fg='bright_green')
 
 
-@cli.command(help='Remove packages', aliases=['uninstall'])
+@cli.command(help='Remove packages', aliases=['uninstall'], group='Packages')
 @click.argument('packages', nargs=-1, required=True, type=str)
 def remove(packages):
     for package in packages:
@@ -137,7 +183,7 @@ def remove(packages):
             f'Removed {package}!', fg='bright_green')
 
 
-@cli.command(help='Update packages')
+@cli.command(help='Update packages', group='Packages')
 @click.argument('packages', nargs=-1, type=str)
 @click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def update(packages, refresh):
@@ -198,10 +244,6 @@ def update(packages, refresh):
 
 
 def main():
-    cli.add_command(update)
-    cli.add_command(install)
-    cli.add_command(remove)
-    cli.add_command(bakery)
     cli()
 
 
