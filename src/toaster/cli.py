@@ -141,12 +141,13 @@ def remove(packages):
 @click.argument('packages', nargs=-1, type=str)
 @click.option('--refresh', help='Refresh Packages', default=True, type=bool)
 def update(packages, refresh):
-    refresh_db()
 
     if not packages:
         packages = ['all']
 
     if 'all' in packages:
+        refresh_db()
+
         secho(
             ':: Updating packages...', fg='bright_magenta')
 
@@ -171,27 +172,29 @@ def update(packages, refresh):
                 exit(1)
         else:
             secho('All up to date! :)', fg='bright_green')
-    else:
-        for package in packages:
-            if refresh:
-                refresh_db(auto=True)
 
+        return
+
+    for package in packages:
+        if refresh:
+            refresh_db(auto=True)
+
+        secho(
+            f':: Installing {package}...', fg='bright_magenta')
+
+        try:
+            update_package(package)
+        except NotFound:
+            errecho(f'{package} is not installed.')
+        except AlreadyInstalled:
             secho(
-                f':: Installing {package}...', fg='bright_magenta')
-
-            try:
-                update_package(package)
-            except NotFound:
-                errecho(f'{package} is not installed.')
-            except AlreadyInstalled:
-                secho(
-                    f'{package} is already up to date :).', fg='bright_green')
-            except NotImplementedError:
-                errecho(
-                    f'{package} was found but is not available because it is a binary or app which is not supported yet.')
-            else:
-                secho(
-                    f'{package} updated!', fg='bright_green')
+                f'{package} is already up to date :).', fg='bright_green')
+        except NotImplementedError:
+            errecho(
+                f'{package} was found but is not available because it is a binary or app which is not supported yet.')
+        else:
+            secho(
+                f'{package} updated!', fg='bright_green')
 
 
 def main():

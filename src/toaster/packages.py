@@ -202,6 +202,9 @@ def update_package(package):
     package_data_loc = os.path.join(
         toaster_loc, 'package_data', f'{package}.toml')
 
+    if not os.path.exists(package_data_loc):
+        raise NotFound
+
     package_toml = toml.load(package_toml_loc)
 
     package_data_toml = toml.load(package_data_loc)
