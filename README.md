@@ -2,11 +2,11 @@
 
 ***This is no where near ready yet and only currently supports building packages.***
 
-A simple package manager for macOS/Linux with support for binary packages and app bundles!
+A simple package manager for macOS/Linux with support for binary packages and app bundles! (in addition to built packages)
 
 ## Features and Goals
 
-- Installable on latest macOS without installing any additional things (besides pip packages)
+- Installable on latest macOS without installing any additional things (besides PIP packages)
 - Support x86_64 (x64) and arm64 processors on both Linux and macOS
 - Manages system updates on macOS
 
