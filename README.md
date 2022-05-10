@@ -1,13 +1,13 @@
-# Toaster - Simple macOS Package Manager
+# Toaster - Simple macOS/Linux Package Manager
+
+***This is no where near ready yet and only currently supports building packages.***
 
 A simple package manager for macOS/Linux with support for binary packages and app bundles!
 
 ## Features and Goals
 
-- Git-based package management
-- Support binary packages and applications (.app packages)
-- Support built-in Python 3
-- Support x86_64 (x64) and ARM processors on both Linux and macOS
+- Installable on latest macOS without installing any additional things (besides pip packages)
+- Support x86_64 (x64) and arm64 processors on both Linux and macOS
 - Manages system updates on macOS
 
 ## Installation
