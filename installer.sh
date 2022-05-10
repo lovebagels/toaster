@@ -53,6 +53,7 @@ python3 -m pip install \
     atomicwrites \
     click \
     click-aliases \
+    filelock \
     requests \
     toml \
     tqdm \
