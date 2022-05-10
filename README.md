@@ -1,6 +1,6 @@
 # Toaster - Simple macOS/Linux Package Manager
 
-***This is no where near ready yet.***
+***This is no where near ready yet and only currently supports building packages.***
 
 A simple package manager for macOS/Linux with support for binary packages and app bundles!
 
