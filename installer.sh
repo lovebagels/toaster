@@ -3,6 +3,7 @@ GREY='\033[0;37m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
 YELLOW='\033[1;33m'
+MAGENTA='\033[1;35m'
 RESET='\033[0m' # No Color
 
 # Get the options
@@ -20,14 +21,20 @@ while getopts ":c" option; do
     esac
 done
 
-# The actual installler
+# Check if toaster is already installed
+[ -d "$HOME/.toaster" ] && echo "${GREEN}Toaster is already installed! 🍞${RESET}" && exit
+
+# The actual installler starts here
 echo "${GREEN}:: Welcome to the toaster installer! 🍞"
 echo ":: This script will download and install toaster and add it to your path${RESET}"
+echo "${GREY}Unless you otherwise specified, everything will be installed to $HOME/.toaster${RESET}\n"
+printf "${MAGENTA}Press enter to continue or Ctrl+C to cancel!${RESET}"
+read -p " "
 
 echo "${GREY}Making ~/.toaster directory...${RED}"
 mkdir ~/.toaster
 
-# Download toaster
+# Download
 if $download; then
     SOURCE_DIR="$HOME/.toaster/toaster"
 
@@ -37,6 +44,7 @@ else
     echo "${YELLOW}Using toaster from current directory...${RESET}"
 fi
 
+# Install
 echo "${GREY}Copying default bakeries....${RED}"
 cp $SOURCE_DIR/defaults/bakery.json ~/.toaster/bakery.json
 
