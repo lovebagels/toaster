@@ -6,6 +6,9 @@ YELLOW='\033[1;33m'
 MAGENTA='\033[1;35m'
 RESET='\033[0m' # No Color
 
+# OS
+OS=$(uname)
+
 # Get the options
 download=true
 
@@ -39,10 +42,21 @@ if $download; then
     SOURCE_DIR="$HOME/.toaster/toaster"
 
     echo "${GREEN}Downloading toaster...${RESET}"
-    git clone https://github.com/wxllow/toaster ~/.toaster/toaster || exit 1
+    git clone https://github.com/lovebagels/toaster ~/.toaster/toaster || exit 1
 else
     echo "${YELLOW}Using toaster from current directory...${RESET}"
 fi
+
+# Download/install dependencies
+python3 -m pip install \
+    GitPython \
+    atomicwrites \
+    click \
+    click-aliases \
+    requests \
+    toml \
+    tqdm \
+    validators
 
 # Install
 echo "${GREY}Copying default bakeries....${RED}"
