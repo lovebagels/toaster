@@ -13,11 +13,12 @@ A list of things to do (for contributors)
 - [x] Properly implement package updates
 - [ ] Support binaries
 - [ ] Implement hash checking
+- [ ] Check before installing that package supports platform
 - [ ] Safer package updates
+- [ ] Allow caching packages
 - [ ] Clean up any bad code/comments
 - [ ] *See **Making installer***
 - [ ] **MILESTONE #1: Support "apps"**
-- [ ] Additional support for binary/building and uninstall scripts
 - [ ] Once you're here, your hard work has paid off, so clean up any code and **add more packages duh :)**
 - [ ] *See **Making installer** once again*
 - [ ] Document toaster and document how bakeries work
