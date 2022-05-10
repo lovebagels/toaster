@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 import sys
-from exceptions import *
 from urllib.parse import urlparse
 
-import validators
-
 import click
-from click_aliases import ClickAliasedGroup
-
 import sysupdates
-from utils import errecho, echo, secho
-from packages import install_package, remove_package, update_package
-from bakery import refresh_bakeries, add_bakery, rm_bakery
+import validators
+from bakery import add_bakery
+from bakery import refresh_bakeries
+from bakery import rm_bakery
+from click_aliases import ClickAliasedGroup
+from exceptions import *
+from packages import install_package
+from packages import remove_package
+from packages import update_package
+from utils import echo
+from utils import errecho
+from utils import secho
 
 
 # https://stackoverflow.com/a/58770064
@@ -19,7 +23,7 @@ class GroupedGroup(ClickAliasedGroup):
     def command(self, *args, **kwargs):
         """Gather the command help groups"""
         help_group = kwargs.pop('group', None)
-        decorator = super(GroupedGroup, self).command(*args, **kwargs)
+        decorator = super().command(*args, **kwargs)
 
         def wrapper(f):
             cmd = decorator(f)
