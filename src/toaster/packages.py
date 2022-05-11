@@ -1,20 +1,46 @@
 """
 Code for handling packages
 """
-from ast import If
-from exceptions import *
-from utils import CloneProgress, dependingonsys, where_is_toaster, errecho, echo, secho
-from bakery import get_all_packages
-from git import Repo
+import json
 import os
 import shutil
-import json
 import subprocess
-import toml
+import tarfile
+from ast import If
+from functools import cache
 from pathlib import Path
+
+import toml
+from bakery import get_all_packages
+from exceptions import *
+from git import Repo
+from utils import CloneProgress
+from utils import dependingonsys
+from utils import download_file
+from utils import echo
+from utils import errecho
+from utils import secho
+from utils import where_is_toaster
 
 
 toaster_loc = where_is_toaster()
+
+
+def get_package_loc(package):
+    p = os.path.join(toaster_loc, 'packages')
+    b = os.path.join(toaster_loc, 'binaries')
+    a = os.path.join(toaster_loc, 'apps')
+
+    if os.path.exists(p):
+        return p
+
+    if os.path.exists(b):
+        return b
+
+    if os.path.exists(a):
+        return a
+
+    raise NotFound
 
 
 def clean_symlinks():
@@ -30,38 +56,28 @@ def clean_symlinks():
 
 def remove_package(package):
     """Remove/uninstall a package"""
-    pkgs = get_all_packages()
-    package_source = None
-    package_dir = os.path.join(toaster_loc, 'packages', package)
+    package_dir = get_package_loc(package)
 
-    if not os.path.exists(package_dir):
-        raise NotFound
+    try:
+        package_toml = toml.load(os.path.join(
+            toaster_loc, 'package_data', f'{package}.toml'))
+    except FileNotFoundError:
+        raise NotFound(package)
 
-    package_toml = toml.load(os.path.join(
-        toaster_loc, 'package_data', f'{package}.toml'))
+    if 'build' in package_toml['types']:
+        if 'uninstall' in package_toml['build']:
+            # Run scripts
+            if dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
+                for cmd in dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
+                    subprocess.run(cmd)
 
-    if 'uninstall' in package_toml['build']:
-        # Run scripts
-        if dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
-            for cmd in dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
-                subprocess.run(cmd)
-
-        # Run make commands
-        if dependingonsys(package_toml['build']['uninstall'], 'make', append_mode=True):
-            for cmd in dependingonsys(package_toml['build']['uninstall'], 'make', append_mode=True):
-                if dependingonsys(package_toml['build']['uninstall'], 'make_sudo'):
-                    subprocess.run(['sudo', 'make'] + cmd)
-                else:
-                    subprocess.run(['make'] + cmd)
+            # Run "post_scripts"
+            if dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
+                for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
+                    subprocess.run(cmd)
 
     if os.path.exists(package_dir):
         shutil.rmtree(package_dir)
-
-    if 'uninstall' in package_toml['build']:
-        # Run "post_scripts"
-        if dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
-            for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
-                subprocess.run(cmd)
 
     # Delete broken symlinks
     clean_symlinks()
@@ -102,7 +118,7 @@ def build_package(repo_dir, package_dir, package_toml, link_warn=True, update=Fa
 
     # Link package binaries to toaster/bin
     link_dirs = dependingonsys(
-        package_toml['build'], '', append_mode=True) or ['bin']
+        package_toml['build'], 'link_dirs', append_mode=True) or ['bin']
 
     try:
         for ld in link_dirs:
@@ -138,10 +154,13 @@ def build_package(repo_dir, package_dir, package_toml, link_warn=True, update=Fa
 
 def install_package(package):
     """Install a package"""
-    try:
-        shutil.rmtree(os.path.join(toaster_loc, '.cache'))
-    except:
-        pass
+    # try:
+    #     shutil.rmtree(os.path.join(toaster_loc, '.cache'))
+    # except:
+    #     pass
+
+    if not os.path.exists(os.path.join(toaster_loc, '.cache')):
+        os.mkdir(os.path.join(toaster_loc, '.cache'))
 
     pkgs = get_all_packages()
     package_source = None
@@ -164,7 +183,52 @@ def install_package(package):
 
     package_toml = toml.load(package_toml_loc)
 
-    if 'build' in package_toml['types']:
+    if 'binary' in package_toml['types']:
+        download_url = dependingonsys(package_toml['binary'], 'url')
+        package_dir = os.path.join(toaster_loc, 'binaries', package)
+        cache_dir = os.path.join(toaster_loc, '.cache', package)
+
+        if os.path.exists(package_dir):
+            raise AlreadyInstalled
+
+        if not os.path.exists(cache_dir):
+            os.mkdir(cache_dir, 0o777)
+
+        file_name = os.path.join(cache_dir, download_url.split("/")[-1])
+
+        if not os.path.exists(file_name):
+            download_file(
+                download_url, file_name
+            )
+
+        # Extract file
+        if dependingonsys(package_toml['binary'], 'type') == 'gz':
+            with tarfile.open(file_name) as f:
+                f.extractall(package_dir)
+        else:
+            raise NotImplemented(
+                f"Type {dependingonsys(package_toml['binary'], 'type')}")
+
+        link_warn = True
+
+        # Link package binaries to toaster/bin
+        link_dirs = dependingonsys(
+            package_toml['binary'], 'link_dirs', append_mode=True) or ['bin']
+
+        try:
+            for ld in link_dirs:
+                ld = os.path.join(package_dir, ld)
+
+                if os.path.isdir(ld):
+                    for filename in os.listdir(ld):
+                        os.symlink(os.path.join(ld, filename),
+                                   os.path.join(toaster_loc, 'bin', filename))
+        except FileExistsError:
+            if link_warn:
+                secho("1 or more links already exist and were not linked.",
+                      fg='bright_black')
+
+    elif 'build' in package_toml['types']:
         repo_dir = os.path.join(toaster_loc, '.cache', package)
         package_dir = os.path.join(toaster_loc, 'packages', package)
 

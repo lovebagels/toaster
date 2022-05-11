@@ -1,12 +1,15 @@
+import hashlib
 import os
 import platform
-import hashlib
 import shutil
 from pathlib import Path
+
 import requests
-from click import echo, secho
+from click import echo
+from click import secho
+from git import RemoteProgress
+from git import Repo
 from tqdm.auto import tqdm
-from git import RemoteProgress, Repo
 
 
 def where_is_toaster():
@@ -19,13 +22,13 @@ def errecho(err, **kwargs):
     secho(err, fg='bright_red', **kwargs)
 
 
-def download_file(url):
+def download_file(url, loc):
     """Download a file"""
     with requests.get(url, stream=True) as r:
         total_length = int(r.headers.get("Content-Length"))
 
-        with tqdm.wrapattr(r.raw, "read", total=total_length, desc="")as raw:
-            with open(f"{os.path.basename(r.url)}", 'wb')as output:
+        with tqdm.wrapattr(r.raw, "read", total=total_length, desc="") as raw:
+            with open(loc, 'wb') as output:
                 shutil.copyfileobj(raw, output)
 
 
