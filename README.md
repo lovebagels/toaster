@@ -23,7 +23,3 @@ sh <(curl -L https://bagels.sh)
 ```bash
 sh <(curl -L https://uninstall.bagels.sh)
 ```
-
-## Installing Dependencies
-
-`pip3 install atomicwrites click GitPython requests tqdm toml validators`
