@@ -1,16 +1,16 @@
 # Making a Package
 
-So, there's an application you want to add to toaster? or maybe you're just curious? 
+So, there's an application you want to add to toaster? or maybe you're just curious?
 
 Well, either way, keep reading to know all you need to know about how toaster packages work.
- 
+
 ## Package files
 
-Every package has a TOML file named after the package, which describes how the package should be installed and uninstalled. 
+Every package has a TOML file named after the package, which describes how the package should be installed and uninstalled.
 
 Here is an example of how a bakery (a git repo with packages in it) may be structured:
 
-```tree 
+```tree
 wxllow/toaster-core
 ├── _toaster.toml
 ├── coolexample
@@ -39,7 +39,7 @@ dependencies = ['python>3.8', 'go']
 
 ### Name and Description
 
-The first 2 things here are the name and description, which are pretty self-explanatory. 
+The first 2 things here are the name and description, which are pretty self-explanatory.
 
 ### Version
 
@@ -71,6 +71,39 @@ This is where you specify which type(s) your package supports. This can be `buil
 
 Here is where you can place all the other packages you require to be installed to install your package. You can specify just a package's name, like `go`, or a minimum version to be required for the package, like `python>=3.7`.
 
+## Binary
+
+Here is an example of a simple binary program's TOML file
+
+The package in question is Go.
+
+```toml
+[binary]
+type = 'gz'
+link_dirs = ['go/bin']
+
+    [[binary.arm64]]
+    url = 'https://storage.googleapis.com/golang/go1.16.darwin-arm64.tar.gz'
+
+    [[binary.x86_64]]
+    url = 'https://storage.googleapis.com/golang/go1.16.darwin-amd64.tar.gz'
+
+```
+
+### URL
+
+First and most importantly is the URL. This is a file archive (`.zip`, `tar.gz`, etc.)
+
+This file is downloaded and then extracted to the package's directory
+
+### Type
+
+This is the type of archive you specified in the URL. (`zip`, `gz`, `xz`, etc.)
+
+### Link Dirs
+
+List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to `['bin']`
+
 ## Build
 
 Here is an example
@@ -81,6 +114,7 @@ repo = 'https://github.com/foo/bar'
 branch = 'master'
 format_scripts = true
 scripts = [['./configure', '--prefix {prefix}'], [['make'], ['install']]]
+link_dirs = ['bin']
 
 # Indentation is optional btw :)
     [[build.universal]]

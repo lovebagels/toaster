@@ -11,30 +11,36 @@ A list of things to do (for contributors)
 - [x] Lock database
 - [x] Clean-up install package function
 - [x] Properly implement package updates
-- [ ] Support binaries
+- [x] Support binaries
+- [x] Binary updates
+- [x] Support other types of archives
+- [x] Document binaries
+- [ ] Document how bakeries work
+- [ ] Properly implement dependencies
+- [ ] Versioning support
+- [ ] Toaster updater
+- [ ] Clean up packages.py code
+- [ ] Clean up code in sysupdates.py
 - [ ] Implement hash checking
 - [ ] Check before installing that package supports platform
 - [ ] Safer package updates
 - [ ] Allow caching packages
 - [ ] Clean up any bad code/comments
+- [ ] Package and bakery info commands
 - [ ] *See **Making installer***
-- [ ] **MILESTONE #1: Support "apps"**
 - [ ] Once you're here, your hard work has paid off, so clean up any code and **add more packages duh :)**
+- [ ] **MILESTONE #1: Launch toaster alpha for macOS**
+- [ ] **MILESTONE #2: Support "apps"**
 - [ ] *See **Making installer** once again*
-- [ ] Document toaster and document how bakeries work
-- [ ] **MILESTONE #2: Make toaster and toaster-core public**
-- [ ] **MILESTONE #3: Launch toaster alpha for macOS**
-- [ ] Support custom installation paths
-- [ ] Test and make any needed fixes for Linux *idk whether to put a :) or :(*
-- [ ] *See **Making installer** once again*
-- [ ] **MILESTONE #4: Launch toaster alpha for Linux**
+- [ ] Make sure Linux support works as expected
 - [ ] Fix any bugs that arise
 - [ ] Add new features
+- [ ] Make toaster prettier
 - [ ] **MILESTONE #5: Launch toaster beta for macOS and Linux**
 
 ## Making installer
 
 - Automatically find Python 3 and install required Python dependencies
 - Move toaster itself to somewhere and add that to path
-- Make /opt/toaster dirs and initiate git stuff there
+- Make ~/.toaster dirs
 - Add toaster's binary directories to path
