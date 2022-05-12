@@ -49,6 +49,22 @@ def get_dependants(package):
     return l
 
 
+def install_dependencies(dependencies, out=True):
+    # print(dependencies)
+    for dependency in dependencies:
+        dependency = dependency.split('>=')[0]
+
+        try:
+            install_package(dependency, ignore_dependencies=True)
+        except AlreadyInstalled as e:
+            if out:
+                secho(
+                    f'Dependency {dependency} is already installed, ignoring!', fg='bright_black')
+                return
+
+            raise e
+
+
 def get_package_loc(package):
     """Get the location of a package"""
     p = os.path.join(toaster_loc, 'packages', package)
@@ -81,16 +97,16 @@ def clean_symlinks():
 def remove_package(package):
     """Remove/uninstall a package"""
     package_dir = get_package_loc(package)
+    package_toml_loc = os.path.join(
+        toaster_loc, 'package_data', f'{package}.toml')
 
     try:
-        package_toml = toml.load(os.path.join(
-            toaster_loc, 'package_data', f'{package}.toml'))
+
+        package_toml = toml.load(package_toml_loc)
     except FileNotFoundError:
         raise NotFound(package)
 
     dependants = get_dependants(package)
-
-    print(dependants)
 
     if dependants:
         raise Exception(f'This package is depended on by {len(dependants)}!')
@@ -109,6 +125,9 @@ def remove_package(package):
 
     if os.path.exists(package_dir):
         shutil.rmtree(package_dir)
+
+    if os.path.exists(package_toml_loc):
+        os.remove(package_toml_loc)
 
     # Delete broken symlinks
     clean_symlinks()
@@ -144,7 +163,7 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
             try:
                 subprocess.run(cmd)
             except:
-                print(f'error running: {cmd}')
+                errecho(f'error running: {cmd}')
 
     # Delete temp cache dir
     shutil.rmtree(repo_dir)
@@ -220,7 +239,7 @@ def _install_binary(package, package_dir, file_name, package_toml):
                   fg='bright_black')
 
 
-def install_package(package):
+def install_package(package, ignore_dependencies=False):
     """Install a package"""
     if not os.path.exists(os.path.join(toaster_loc, '.cache')):
         os.mkdir(os.path.join(toaster_loc, '.cache'))
@@ -245,6 +264,11 @@ def install_package(package):
     shutil.copyfile(package_toml_loc, package_data_loc)
 
     package_toml = toml.load(package_toml_loc)
+
+    if not ignore_dependencies:
+        install_dependencies(dependingonsys(
+            package_toml, 'dependencies', append_mode=True)
+        )
 
     if 'binary' in package_toml['types']:
         download_url = dependingonsys(package_toml['binary'], 'url')
@@ -278,8 +302,8 @@ def install_package(package):
         if not git_url:
             raise Exception('No repo in TOML')
 
-        Repo.clone_from(git_url, repo_dir,
-                        progress=CloneProgress(package, git_url))
+        Repo.clone_from(git_url, repo_dir, branch=(dependingonsys(
+            package_toml['builf'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
 
         _build_package(repo_dir, package_dir, package_toml)
     else:
@@ -326,8 +350,8 @@ def update_package(package):
         if not git_url:
             raise Exception('No repo in TOML')
 
-        Repo.clone_from(git_url, repo_dir,
-                        progress=CloneProgress(package, git_url))
+        Repo.clone_from(git_url, repo_dir, branch=(dependingonsys(
+            package_toml['builf'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
 
         # Copy package TOML to package_data for uninstall and in case bakery is removed
         shutil.copyfile(package_toml_loc, package_data_loc)
