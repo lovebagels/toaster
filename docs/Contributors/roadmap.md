@@ -16,8 +16,12 @@ A list of things to do (for contributors)
 - [x] Support other types of archives
 - [x] Document binaries
 - [ ] Document how bakeries work
-- [ ] Properly implement dependencies
+- [x] Properly implement dependencies
 - [ ] Versioning support
+- [ ] External dependencies
+- [ ] Dont link if already in pass
+- [ ] Link command
+- [ ] Info command
 - [ ] Toaster updater
 - [ ] Clean up packages.py code
 - [ ] Clean up code in sysupdates.py
