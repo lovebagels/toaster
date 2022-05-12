@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 import tarfile
+import zipfile
 from ast import If
 from functools import cache
 from pathlib import Path
@@ -26,10 +27,33 @@ from utils import where_is_toaster
 toaster_loc = where_is_toaster()
 
 
+# DEPENDENCIES
+def get_dependants(package):
+    """Get list of installed packages that depend on a package"""
+    l = []
+
+    package_data_loc = os.path.join(
+        toaster_loc, 'package_data')
+
+    package_toml = toml.load(os.path.join(package_data_loc, f'{package}.toml'))
+
+    for filename in os.listdir(package_data_loc):
+        package_toml = toml.load(os.path.join(
+            package_data_loc, filename))
+
+        # print(package_toml)
+
+        if package in package_toml.get('dependencies', []):
+            l.append(filename.split('.')[0])
+
+    return l
+
+
 def get_package_loc(package):
-    p = os.path.join(toaster_loc, 'packages')
-    b = os.path.join(toaster_loc, 'binaries')
-    a = os.path.join(toaster_loc, 'apps')
+    """Get the location of a package"""
+    p = os.path.join(toaster_loc, 'packages', package)
+    b = os.path.join(toaster_loc, 'binaries', package)
+    a = os.path.join(toaster_loc, 'apps', package)
 
     if os.path.exists(p):
         return p
@@ -40,7 +64,7 @@ def get_package_loc(package):
     if os.path.exists(a):
         return a
 
-    raise NotFound
+    raise NotFound(package)
 
 
 def clean_symlinks():
@@ -64,6 +88,13 @@ def remove_package(package):
     except FileNotFoundError:
         raise NotFound(package)
 
+    dependants = get_dependants(package)
+
+    print(dependants)
+
+    if dependants:
+        raise Exception(f'This package is depended on by {len(dependants)}!')
+
     if 'build' in package_toml['types']:
         if 'uninstall' in package_toml['build']:
             # Run scripts
@@ -83,7 +114,8 @@ def remove_package(package):
     clean_symlinks()
 
 
-def build_package(repo_dir, package_dir, package_toml, link_warn=True, update=False):
+def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=False):
+    """Build/install a package"""
     wd = os.getcwd()
 
     os.chdir(repo_dir)
@@ -114,6 +146,7 @@ def build_package(repo_dir, package_dir, package_toml, link_warn=True, update=Fa
             except:
                 print(f'error running: {cmd}')
 
+    # Delete temp cache dir
     shutil.rmtree(repo_dir)
 
     # Link package binaries to toaster/bin
@@ -152,13 +185,43 @@ def build_package(repo_dir, package_dir, package_toml, link_warn=True, update=Fa
     os.chdir(wd)
 
 
+def _install_binary(package, package_dir, file_name, package_toml):
+    """Installs a binary package"""
+    # Extract file
+    type = dependingonsys(package_toml['binary'], 'type').strip().lower()
+
+    if type in ['tar', 'gz', 'xz']:
+        with tarfile.open(file_name) as f:
+            f.extractall(package_dir)
+    elif type == 'zip':
+        with zipfile.ZipFile(file_name, 'r') as f:
+            f.extractall(package_dir)
+    else:
+        msg = f"Unknown archive type: {dependingonsys(package_toml['binary'], 'type')}"
+        raise NotImplemented(msg)
+
+    link_warn = True
+
+    # Link package binaries to toaster/bin
+    link_dirs = dependingonsys(
+        package_toml['binary'], 'link_dirs', append_mode=True) or ['bin']
+
+    try:
+        for ld in link_dirs:
+            ld = os.path.join(package_dir, ld)
+
+            if os.path.isdir(ld):
+                for filename in os.listdir(ld):
+                    os.symlink(os.path.join(ld, filename),
+                               os.path.join(toaster_loc, 'bin', filename))
+    except FileExistsError:
+        if link_warn:
+            secho("1 or more links already exist and were not linked.",
+                  fg='bright_black')
+
+
 def install_package(package):
     """Install a package"""
-    # try:
-    #     shutil.rmtree(os.path.join(toaster_loc, '.cache'))
-    # except:
-    #     pass
-
     if not os.path.exists(os.path.join(toaster_loc, '.cache')):
         os.mkdir(os.path.join(toaster_loc, '.cache'))
 
@@ -170,7 +233,7 @@ def install_package(package):
             package_source = key
 
     if not package_source:
-        raise NotFound
+        raise NotFound(package)
 
     package_toml_loc = os.path.join(
         toaster_loc, 'bakery', package_source, package, f'{package}.toml')
@@ -201,32 +264,7 @@ def install_package(package):
                 download_url, file_name
             )
 
-        # Extract file
-        if dependingonsys(package_toml['binary'], 'type') == 'gz':
-            with tarfile.open(file_name) as f:
-                f.extractall(package_dir)
-        else:
-            raise NotImplemented(
-                f"Type {dependingonsys(package_toml['binary'], 'type')}")
-
-        link_warn = True
-
-        # Link package binaries to toaster/bin
-        link_dirs = dependingonsys(
-            package_toml['binary'], 'link_dirs', append_mode=True) or ['bin']
-
-        try:
-            for ld in link_dirs:
-                ld = os.path.join(package_dir, ld)
-
-                if os.path.isdir(ld):
-                    for filename in os.listdir(ld):
-                        os.symlink(os.path.join(ld, filename),
-                                   os.path.join(toaster_loc, 'bin', filename))
-        except FileExistsError:
-            if link_warn:
-                secho("1 or more links already exist and were not linked.",
-                      fg='bright_black')
+        _install_binary(package, package_dir, file_name, package_toml)
 
     elif 'build' in package_toml['types']:
         repo_dir = os.path.join(toaster_loc, '.cache', package)
@@ -243,7 +281,7 @@ def install_package(package):
         Repo.clone_from(git_url, repo_dir,
                         progress=CloneProgress(package, git_url))
 
-        build_package(repo_dir, package_dir, package_toml)
+        _build_package(repo_dir, package_dir, package_toml)
     else:
         raise NotImplementedError
 
@@ -258,7 +296,7 @@ def update_package(package):
             package_source = key
 
     if not package_source:
-        raise NotFound
+        raise NotFound(package)
 
     package_toml_loc = os.path.join(
         toaster_loc, 'bakery', package_source, package, f'{package}.toml')
@@ -267,7 +305,7 @@ def update_package(package):
         toaster_loc, 'package_data', f'{package}.toml')
 
     if not os.path.exists(package_data_loc):
-        raise NotFound
+        raise NotFound(package)
 
     package_toml = toml.load(package_toml_loc)
 
@@ -281,7 +319,7 @@ def update_package(package):
         package_dir = os.path.join(toaster_loc, 'packages', package)
 
         if not os.path.exists(package_dir):
-            raise NotFound
+            raise NotFound(package)
 
         git_url = dependingonsys(package_toml['build'], 'repo')
 
@@ -294,7 +332,7 @@ def update_package(package):
         # Copy package TOML to package_data for uninstall and in case bakery is removed
         shutil.copyfile(package_toml_loc, package_data_loc)
 
-        build_package(repo_dir, package_dir, package_toml,
-                      link_warn=True, update=True)
+        _build_package(repo_dir, package_dir, package_toml,
+                       link_warn=True, update=True)
     else:
         raise NotImplementedError
