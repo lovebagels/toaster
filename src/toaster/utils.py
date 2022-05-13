@@ -75,7 +75,7 @@ def dependingonsys(d, item, append_mode=False):
         else:
             res = d[item]
 
-    if platform.system() == 'Linux':
+    if platform.system() != 'Darwin':
         if 'linux_any' in d:
             ans = _get_val_for_sys(d, item, 'linux_any')
 
