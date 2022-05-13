@@ -283,7 +283,6 @@ def update(packages, refresh):
         secho('Toaster is now up to date! :)', fg='bright_green')
 
         return
-
     # Update packages
     if refresh:
         refresh_db(auto=True)

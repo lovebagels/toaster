@@ -15,6 +15,7 @@ import toml
 from bakery import get_all_packages
 from exceptions import *
 from git import Repo
+from packaging import version
 from utils import CloneProgress
 from utils import dependingonsys
 from utils import download_file
@@ -71,9 +72,8 @@ def get_dependants(package):
 def install_dependencies(dependencies, out=True):
     """Install dependencies for a package"""
     for dependency in dependencies:
-        dependency = dependency.split('>=')[0]
-
         try:
+            secho(f"Installing dependency: {dependency}", fg="bright_magenta")
             install_package(dependency, ignore_dependencies=True)
         except AlreadyInstalled as e:
             if out:
@@ -258,8 +258,15 @@ def _install_binary(package, package_dir, file_name, package_toml):
                   fg='bright_black')
 
 
-def install_package(package, ignore_dependencies=False):
+def install_package(package_name, ignore_dependencies=False):
     """Install a package"""
+    package = package_name.split('>=')[0]
+
+    package_minver = None
+
+    if len(package_name.split('>=')) > 1:
+        package_minver = package_name.split('>=')[1]
+
     if not os.path.exists(os.path.join(toaster_loc, '.cache')):
         os.mkdir(os.path.join(toaster_loc, '.cache'))
 
@@ -283,6 +290,11 @@ def install_package(package, ignore_dependencies=False):
     shutil.copyfile(package_toml_loc, package_data_loc)
 
     package_toml = toml.load(package_toml_loc)
+
+    if package_minver:
+        if version.parse(package_minver) > version.parse(package_toml.get('version', 0)):
+            raise NotFound(
+                f'Could not meet minimum version requirement {package_minver} for {package}')
 
     if not ignore_dependencies:
         install_dependencies(dependingonsys(
@@ -322,7 +334,7 @@ def install_package(package, ignore_dependencies=False):
             raise Exception('No repo in TOML')
 
         Repo.clone_from(git_url, repo_dir, branch=(dependingonsys(
-            package_toml['builf'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
+            package_toml['build'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
 
         _build_package(repo_dir, package_dir, package_toml)
     else:
@@ -370,7 +382,7 @@ def update_package(package):
             raise Exception('No repo in TOML')
 
         Repo.clone_from(git_url, repo_dir, branch=(dependingonsys(
-            package_toml['builf'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
+            package_toml['build'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
 
         # Copy package TOML to package_data for uninstall and in case bakery is removed
         shutil.copyfile(package_toml_loc, package_data_loc)
