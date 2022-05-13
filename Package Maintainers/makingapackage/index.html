@@ -372,6 +372,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#binary" class="md-nav__link">
+    Binary
+  </a>
+  
+    <nav class="md-nav" aria-label="Binary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url" class="md-nav__link">
+    URL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type" class="md-nav__link">
+    Type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#link-dirs" class="md-nav__link">
+    Link Dirs
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#build" class="md-nav__link">
     Build
   </a>
@@ -394,7 +428,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#link-dirs" class="md-nav__link">
+  <a href="#link-dirs_1" class="md-nav__link">
     Link dirs
   </a>
   
@@ -585,6 +619,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#binary" class="md-nav__link">
+    Binary
+  </a>
+  
+    <nav class="md-nav" aria-label="Binary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#url" class="md-nav__link">
+    URL
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type" class="md-nav__link">
+    Type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#link-dirs" class="md-nav__link">
+    Link Dirs
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#build" class="md-nav__link">
     Build
   </a>
@@ -607,7 +675,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#link-dirs" class="md-nav__link">
+  <a href="#link-dirs_1" class="md-nav__link">
     Link dirs
   </a>
   
@@ -654,10 +722,10 @@
 
 
 <h1 id="making-a-package">Making a Package</h1>
-<p>So, there's an application you want to add to toaster? or maybe you're just curious? </p>
+<p>So, there's an application you want to add to toaster? or maybe you're just curious?</p>
 <p>Well, either way, keep reading to know all you need to know about how toaster packages work.</p>
 <h2 id="package-files">Package files</h2>
-<p>Every package has a TOML file named after the package, which describes how the package should be installed and uninstalled. </p>
+<p>Every package has a TOML file named after the package, which describes how the package should be installed and uninstalled.</p>
 <p>Here is an example of how a bakery (a git repo with packages in it) may be structured:</p>
 <pre><code class="language-tree">wxllow/toaster-core
 ├── _toaster.toml
@@ -680,7 +748,7 @@ types = ['binary', 'build'] # Possible values: 'binary', 'build', 'app'
 dependencies = ['python&gt;3.8', 'go']
 </code></pre>
 <h3 id="name-and-description">Name and Description</h3>
-<p>The first 2 things here are the name and description, which are pretty self-explanatory. </p>
+<p>The first 2 things here are the name and description, which are pretty self-explanatory.</p>
 <h3 id="version">Version</h3>
 <p>Next is the version and the version type. These can be any string, but we recommend using a semantic version number and having version_type either be <code>stable</code>, <code>development</code>, <code>prototype</code>,<code>beta</code>, <code>alpha</code>, or something along those lines</p>
 <h3 id="license">License</h3>
@@ -696,6 +764,27 @@ dependencies = ['python&gt;3.8', 'go']
 <p><code>app</code> means a GUI-only .app bundle <strong><em>(macOS only)</em></strong></p>
 <h3 id="dependencies">Dependencies</h3>
 <p>Here is where you can place all the other packages you require to be installed to install your package. You can specify just a package's name, like <code>go</code>, or a minimum version to be required for the package, like <code>python&gt;=3.7</code>.</p>
+<h2 id="binary">Binary</h2>
+<p>Here is an example of a simple binary program's TOML file</p>
+<p>The package in question is Go.</p>
+<pre><code class="language-toml">[binary]
+type = 'gz'
+link_dirs = ['go/bin']
+
+    [[binary.arm64]]
+    url = 'https://storage.googleapis.com/golang/go1.16.darwin-arm64.tar.gz'
+
+    [[binary.x86_64]]
+    url = 'https://storage.googleapis.com/golang/go1.16.darwin-amd64.tar.gz'
+
+</code></pre>
+<h3 id="url">URL</h3>
+<p>First and most importantly is the URL. This is a file archive (<code>.zip</code>, <code>tar.gz</code>, etc.)</p>
+<p>This file is downloaded and then extracted to the package's directory</p>
+<h3 id="type">Type</h3>
+<p>This is the type of archive you specified in the URL. (<code>zip</code>, <code>gz</code>, <code>xz</code>, etc.)</p>
+<h3 id="link-dirs">Link Dirs</h3>
+<p>List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to <code>['bin']</code></p>
 <h2 id="build">Build</h2>
 <p>Here is an example</p>
 <pre><code class="language-toml">[build]
@@ -703,6 +792,7 @@ repo = 'https://github.com/foo/bar'
 branch = 'master'
 format_scripts = true
 scripts = [['./configure', '--prefix {prefix}'], [['make'], ['install']]]
+link_dirs = ['bin']
 
 # Indentation is optional btw :)
     [[build.universal]]
@@ -717,7 +807,7 @@ scripts = [['./configure', '--prefix {prefix}'], [['make'], ['install']]]
 <p>The first two items here tell toaster which Git repo to download the source code from and which branch of that repo to use.</p>
 <h3 id="format-scripts">Format Scripts?</h3>
 <p>This is a boolean which tells toaster whether it should format scripts with things like {prefix} which contain data, such as where the package should be installed, in the case of {prefix}.</p>
-<h3 id="link-dirs">Link dirs</h3>
+<h3 id="link-dirs_1">Link dirs</h3>
 <p>List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to <code>['bin']</code></p>
 <h3 id="scripts">Scripts</h3>
 <p>These are scripts to run during installation <strong>in the temp directory with the package's source code</strong>.</p>
