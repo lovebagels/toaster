@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import platform
 import sys
 from urllib.parse import urlparse
 
@@ -10,12 +11,14 @@ from bakery import refresh_bakeries
 from bakery import rm_bakery
 from click_aliases import ClickAliasedGroup
 from exceptions import *
+from packages import get_info as get_package_info
 from packages import install_package
 from packages import remove_package
 from packages import update_package
 from utils import echo
 from utils import errecho
 from utils import secho
+from utils import update_toaster
 
 
 # https://stackoverflow.com/a/58770064
@@ -147,6 +150,42 @@ def unbake(bakeries):
         secho(f'Bakery {name} removed!', fg='bright_green')
 
 
+@cli.command(help='Get info about packages', group='Packages')
+@click.argument('packages', nargs=-1, required=True, type=str)
+def info(packages):
+    """Get info about a package"""
+    for package in packages:
+        try:
+            package_toml = get_package_info(package)
+        except NotFound:
+            errecho(f'{package} could not be found.')
+        else:
+            secho(
+                f"::: {package_toml.get('name')} {package_toml.get('version', '')} :::", fg='bright_magenta')
+
+            secho(f"{package_toml.get('desc', 'No description.')}\n",
+                  fg='bright_black')
+
+            # Version info
+            secho(
+                f"Version: {package_toml.get('version', 'Unknown')}", fg='bright_yellow')
+            secho(
+                f"Version type: {package_toml.get('version_type', 'Unknown').title()}\n", fg='bright_yellow')
+
+            # License
+            secho(
+                f"License: {package_toml.get('license', 'Unknown')}\n", fg='bright_yellow')
+
+            # Architectures
+            if platform.system() == 'Linux':
+                archs = package_toml.get("linux_archs", [])
+            else:
+                archs = package_toml.get("archs", [])
+
+            secho(
+                f"Architectures: {', '.join(archs) or 'None'}", fg='green')
+
+
 @cli.command(help='Install packages', group='Packages')
 @click.argument('packages', nargs=-1, required=True, type=str)
 @click.option('--refresh', help='Refresh Packages', default=True, type=bool)
@@ -229,6 +268,19 @@ def update(packages, refresh):
             secho('All up to date! :)', fg='bright_green')
 
         return
+
+    if 'toaster' in packages:
+        secho(
+            ':: Updating toaster...', fg='bright_magenta')
+
+        try:
+            update_toaster()
+        except NotFound:
+            errecho(
+                'Toaster source code is not in the standard location... you will need to manually update it!')
+            return
+
+        secho('Toaster is now up to date! :)', fg='bright_green')
 
     # Update packages
     if refresh:

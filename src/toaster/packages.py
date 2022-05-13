@@ -27,15 +27,34 @@ from utils import where_is_toaster
 toaster_loc = where_is_toaster()
 
 
-# DEPENDENCIES
+# Package Info
+def get_info(package):
+    toml_loc = os.path.join(
+        toaster_loc, 'package_data', f'{package}.toml')
+
+    if not os.path.exists(toml_loc):
+        pkgs = get_all_packages()
+        package_source = None
+
+        for key in pkgs:
+            if package in pkgs[key]:
+                package_source = key
+
+        if not package_source:
+            raise NotFound(package)
+
+        toml_loc = os.path.join(toaster_loc, 'bakery',
+                                package_source, package, f'{package}.toml')
+
+    return toml.load(toml_loc)
+
+
 def get_dependants(package):
     """Get list of installed packages that depend on a package"""
     l = []
 
     package_data_loc = os.path.join(
         toaster_loc, 'package_data')
-
-    package_toml = toml.load(os.path.join(package_data_loc, f'{package}.toml'))
 
     for filename in os.listdir(package_data_loc):
         package_toml = toml.load(os.path.join(
@@ -50,7 +69,7 @@ def get_dependants(package):
 
 
 def install_dependencies(dependencies, out=True):
-    # print(dependencies)
+    """Install dependencies for a package"""
     for dependency in dependencies:
         dependency = dependency.split('>=')[0]
 

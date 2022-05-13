@@ -7,6 +7,7 @@ from pathlib import Path
 import requests
 from click import echo
 from click import secho
+from exceptions import NotFound
 from git import RemoteProgress
 from git import Repo
 from tqdm.auto import tqdm
@@ -123,6 +124,16 @@ def dependingonsys(d, item, append_mode=False):
                         res = ans
 
     return res
+
+
+def update_toaster():
+    toaster_src_dir = os.path.join(where_is_toaster(), 'toaster')
+
+    if not os.path.exists(toaster_src_dir):
+        raise NotFound('toaster source')
+
+    repo = Repo(toaster_src_dir)
+    repo.remotes.origin.pull()
 
 
 class CloneProgress(RemoteProgress):
