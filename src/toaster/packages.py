@@ -7,9 +7,6 @@ import shutil
 import subprocess
 import tarfile
 import zipfile
-from ast import If
-from functools import cache
-from pathlib import Path
 
 import toml
 from bakery import get_all_packages
