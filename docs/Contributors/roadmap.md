@@ -19,9 +19,9 @@ A list of things to do (for contributors)
 - [x] Properly implement dependencies
 - [ ] Versioning support
 - [ ] External dependencies
-- [ ] Dont link if already in pass
+- [ ] Dont link if already in path (or ask)
 - [ ] Link command
-- [ ] Info command
+- [ ] Info command for bakeries
 - [ ] Toaster updater
 - [ ] Clean up packages.py code
 - [ ] Clean up code in sysupdates.py
