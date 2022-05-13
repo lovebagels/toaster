@@ -1,3 +1,7 @@
+# Toasted Platforms - Toaster for unsupported platforms
+
+Toaster fork made by toaster devs which aims to support toaster on non-macOS/Linux systems, mainly UNIX-like.
+
 # Toaster - Simple macOS/Linux Package Manager
 
 ***This is no where near ready yet and only currently supports building packages.***
