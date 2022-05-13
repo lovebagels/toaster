@@ -22,7 +22,7 @@ A list of things to do (for contributors)
 - [ ] Dont link if already in path (or ask)
 - [ ] Link command
 - [ ] Info command for bakeries
-- [ ] Toaster updater
+- [x] Toaster updater
 - [ ] Clean up packages.py code
 - [ ] Clean up code in sysupdates.py
 - [ ] Implement hash checking
