@@ -17,7 +17,7 @@ A list of things to do (for contributors)
 - [x] Document binaries
 - [ ] Document how bakeries work
 - [x] Properly implement dependencies
-- [ ] Versioning support
+- [x] Versioning support
 - [ ] External dependencies
 - [ ] Dont link if already in path (or ask)
 - [ ] Link command

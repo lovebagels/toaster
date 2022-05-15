@@ -99,6 +99,29 @@ def get_package_loc(package):
     raise NotFound(package)
 
 
+def make_symlinks(package_toml, package_dir, link_warn=True):
+    """Makes symlinks"""
+    # Link package binaries to toaster/bin
+    link_dirs = dependingonsys(
+        package_toml['binary'], 'link_dirs', append_mode=True) or ['bin']
+
+    try:
+        for ld in link_dirs:
+            ld = os.path.join(package_dir, ld)
+
+            if os.path.isdir(ld):
+                for filename in os.listdir(ld):
+                    if shutil.which(filename.split('/')[-1]):
+                        raise FileExistsError
+
+                    os.symlink(os.path.join(ld, filename),
+                               os.path.join(toaster_loc, 'bin', filename))
+    except FileExistsError:
+        if link_warn:
+            secho("1 or more links already exist and were not linked.",
+                  fg='bright_black')
+
+
 def clean_symlinks():
     """Cleans left over symbolic links from uninstalled/updated packages"""
     bin_dir = os.path.join(toaster_loc, 'bin')
@@ -184,23 +207,6 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
     # Delete temp cache dir
     shutil.rmtree(repo_dir)
 
-    # Link package binaries to toaster/bin
-    link_dirs = dependingonsys(
-        package_toml['build'], 'link_dirs', append_mode=True) or ['bin']
-
-    try:
-        for ld in link_dirs:
-            ld = os.path.join(package_dir, ld)
-
-            if os.path.isdir(ld):
-                for filename in os.listdir(ld):
-                    os.symlink(os.path.join(ld, filename),
-                               os.path.join(toaster_loc, 'bin', filename))
-    except FileExistsError:
-        if link_warn:
-            secho("1 or more links already exist and were not linked.",
-                  fg='bright_black')
-
     os.chdir(package_dir)
 
     # Run "post_scripts"
@@ -216,6 +222,10 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
                 cmd = cmdnew
 
             subprocess.run(cmd)
+
+    link_warn = True
+
+    make_symlinks(package_toml, package_dir, link_warn)
 
     os.chdir(wd)
 
@@ -237,22 +247,7 @@ def _install_binary(package, package_dir, file_name, package_toml):
 
     link_warn = True
 
-    # Link package binaries to toaster/bin
-    link_dirs = dependingonsys(
-        package_toml['binary'], 'link_dirs', append_mode=True) or ['bin']
-
-    try:
-        for ld in link_dirs:
-            ld = os.path.join(package_dir, ld)
-
-            if os.path.isdir(ld):
-                for filename in os.listdir(ld):
-                    os.symlink(os.path.join(ld, filename),
-                               os.path.join(toaster_loc, 'bin', filename))
-    except FileExistsError:
-        if link_warn:
-            secho("1 or more links already exist and were not linked.",
-                  fg='bright_black')
+    make_symlinks(package_toml, package_dir, link_warn)
 
 
 def install_package(package_name, ignore_dependencies=False):
