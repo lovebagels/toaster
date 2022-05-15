@@ -177,7 +177,7 @@ def info(packages):
                 f"License: {package_toml.get('license', 'Unknown')}\n", fg='bright_yellow')
 
             # Architectures
-            if platform.system() == 'Linux':
+            if platform.system() != 'Darwin':
                 archs = package_toml.get("linux_archs", [])
             else:
                 archs = package_toml.get("archs", [])
