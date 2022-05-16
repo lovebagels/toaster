@@ -39,11 +39,15 @@ dependencies = ['python>3.8', 'go']
 
 ### Name and Description
 
-The first 2 things here are the name and description, which are pretty self-explanatory.
+The first 2 things here are the name (`name`) and description (`desc`), which are pretty self-explanatory.
 
 ### Version
 
 Next is the version and the version type. These can be any string, but we recommend using a semantic version number and having version_type either be `stable`, `development`, `prototype`,`beta`, `alpha`, or something along those lines
+
+## Homepage
+
+A URL which has information about the package, can be anything.
 
 ### License
 
