@@ -270,27 +270,28 @@ def update(packages, refresh):
 
         secho('Packages are now up to date! :)\n', fg='bright_green')
 
-        secho(
-            ':: Checking for macOS updates...', fg='bright_magenta')
+        if platform.system() == 'Darwin':
+            secho(
+                ':: Checking for macOS updates...', fg='bright_magenta')
 
-        c = sysupdates.check_updates()
-        if c[0] != 0:
-            errecho(
-                'An error has occured while checking for updates.')
-            exit(1)
-
-        if c[1]:
-            secho('System updates available, starting updates!',
-                  fg='bright_green')
-
-            r = sysupdates.all()
-
-            if r != 0:
+            c = sysupdates.check_updates()
+            if c[0] != 0:
                 errecho(
-                    'An error has occured while updating your system.')
+                    'An error has occured while checking for updates.')
                 exit(1)
-        else:
-            secho('All up to date! :)\n', fg='bright_green')
+
+            if c[1]:
+                secho('System updates available, starting updates!',
+                      fg='bright_green')
+
+                r = sysupdates.all()
+
+                if r != 0:
+                    errecho(
+                        'An error has occured while updating your system.')
+                    exit(1)
+            else:
+                secho('All up to date! :)\n', fg='bright_green')
 
         return
 
