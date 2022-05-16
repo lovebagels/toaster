@@ -28,7 +28,7 @@ toaster_loc = where_is_toaster()
 
 # Package Info
 def get_info(package):
-    """Get info about a package. Returns a dictionary"""
+    """Returns a packages TOML file either installed or from a bakery."""
     toml_loc = os.path.join(
         toaster_loc, 'package_data', f'{package}.toml')
 
@@ -82,7 +82,7 @@ def install_dependencies(dependencies, out=True):
 
 
 def get_package_loc(package):
-    """Get the location of a package"""
+    """Get the location of an installed package"""
     p = os.path.join(toaster_loc, 'packages', package)
     b = os.path.join(toaster_loc, 'binaries', package)
     a = os.path.join(toaster_loc, 'apps', package)
@@ -172,6 +172,23 @@ def remove_package(package):
     clean_symlinks()
 
 
+def _tar_members(base, tar, strip=1):
+    members = []
+
+    for member in tar.getmembers():
+        p = Path(member.path)
+        member.path = os.path.join(
+            base, p.relative_to(*p.parts[:strip]))
+        members.append(member)
+
+    return members
+
+
+def _extract_tar(path, file_name):
+    with tarfile.open(file_name) as f:
+        f.extractall(members=_tar_members(path, f))
+
+
 def _build_package(repo_dir, package_dir, package_toml, file_name=None, is_git=True, link_warn=True, update=False):
     """Build/install a package"""
     wd = os.getcwd()
@@ -192,20 +209,8 @@ def _build_package(repo_dir, package_dir, package_toml, file_name=None, is_git=T
         archive_type = dependingonsys(
             package_toml['build'], 'type').strip().lower()
 
-        def members(base, tar, strip=1):
-            members = []
-
-            for member in tar.getmembers():
-                p = Path(member.path)
-                member.path = os.path.join(
-                    base, p.relative_to(*p.parts[:strip]))
-                members.append(member)
-
-            return members
-
         if archive_type in ['tar', 'gz', 'xz']:
-            with tarfile.open(file_name) as f:
-                f.extractall(members=members(repo_dir, f))
+            _extract_tar(repo_dir, file_name)
         elif archive_type == 'zip':
             with zipfile.ZipFile(file_name, 'r') as f:
                 f.extractall(repo_dir)
@@ -270,8 +275,7 @@ def _install_binary(package, package_dir, file_name, package_toml, link_warn=Tru
         package_toml['binary'], 'type').strip().lower()
 
     if archive_type in ['tar', 'gz', 'xz']:
-        with tarfile.open(file_name) as f:
-            f.extractall(package_dir)
+        _extract_tar(package_dir, file_name)
     elif archive_type == 'zip':
         with zipfile.ZipFile(file_name, 'r') as f:
             f.extractall(package_dir)
