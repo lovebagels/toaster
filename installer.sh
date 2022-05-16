@@ -61,6 +61,7 @@ python3 -m pip install \
     click-aliases \
     filelock \
     packaging \
+    pathlib \
     requests \
     toml \
     tqdm \

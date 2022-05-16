@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tarfile
 import zipfile
+from pathlib import Path
 
 import toml
 from bakery import get_all_packages
@@ -171,11 +172,9 @@ def remove_package(package):
     clean_symlinks()
 
 
-def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=False):
+def _build_package(repo_dir, package_dir, package_toml, file_name=None, is_git=True, link_warn=True, update=False):
     """Build/install a package"""
     wd = os.getcwd()
-
-    os.chdir(repo_dir)
 
     if update:
         if os.path.exists(package_dir):
@@ -184,6 +183,39 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
     # Make package dir and package/bin dir
     os.mkdir(package_dir)
     os.mkdir(os.path.join(package_dir, 'bin'))
+
+    if not is_git:
+        repo_dir = os.path.join(
+            toaster_loc, '.cache', f'extracted{os.path.split(file_name)[-1]}')
+
+        # Extract file
+        archive_type = dependingonsys(
+            package_toml['build'], 'type').strip().lower()
+
+        def members(base, tar, strip=1):
+            members = []
+
+            for member in tar.getmembers():
+                p = Path(member.path)
+                member.path = os.path.join(
+                    base, p.relative_to(*p.parts[:strip]))
+                members.append(member)
+
+            return members
+
+        if archive_type in ['tar', 'gz', 'xz']:
+            with tarfile.open(file_name) as f:
+                f.extractall(members=members(repo_dir, f))
+        elif archive_type == 'zip':
+            with zipfile.ZipFile(file_name, 'r') as f:
+                f.extractall(repo_dir)
+        else:
+            msg = f"Unknown archive type: {dependingonsys(package_toml['build'], 'type')}"
+            raise NotImplemented(msg)
+
+        link_warn = True
+
+    os.chdir(repo_dir)
 
     # Run scripts
     if dependingonsys(package_toml['build'], 'scripts', append_mode=True):
@@ -199,6 +231,8 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
                 cmd = cmdnew
 
             try:
+                subprocess.run(['ls'])
+
                 subprocess.run(cmd)
             except:
                 errecho(f'error running: {cmd}')
@@ -229,22 +263,21 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
     os.chdir(wd)
 
 
-def _install_binary(package, package_dir, file_name, package_toml):
+def _install_binary(package, package_dir, file_name, package_toml, link_warn=True):
     """Installs a binary package"""
     # Extract file
-    type = dependingonsys(package_toml['binary'], 'type').strip().lower()
+    archive_type = dependingonsys(
+        package_toml['binary'], 'type').strip().lower()
 
-    if type in ['tar', 'gz', 'xz']:
+    if archive_type in ['tar', 'gz', 'xz']:
         with tarfile.open(file_name) as f:
             f.extractall(package_dir)
-    elif type == 'zip':
+    elif archive_type == 'zip':
         with zipfile.ZipFile(file_name, 'r') as f:
             f.extractall(package_dir)
     else:
         msg = f"Unknown archive type: {dependingonsys(package_toml['binary'], 'type')}"
         raise NotImplemented(msg)
-
-    link_warn = True
 
     make_symlinks(package_toml['binary'], package_dir, link_warn)
 
@@ -320,14 +353,26 @@ def install_package(package_name, ignore_dependencies=False):
             raise AlreadyInstalled
 
         git_url = dependingonsys(package_toml['build'], 'repo')
+        url = dependingonsys(package_toml['build'], 'url')
 
-        if not git_url:
-            raise Exception('No repo in TOML')
+        file_name = None
 
-        Repo.clone_from(git_url, repo_dir, branch=(dependingonsys(
-            package_toml['build'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
+        is_git = bool(git_url)
 
-        _build_package(repo_dir, package_dir, package_toml)
+        if git_url:
+            Repo.clone_from(git_url, repo_dir, branch=(dependingonsys(
+                package_toml['build'], 'branch') or 'master'), progress=CloneProgress(package, git_url))
+        elif url:
+            cache_dir = os.path.join(toaster_loc, '.cache')
+
+            file_name = os.path.join(cache_dir, url.split("/")[-1])
+
+            if not os.path.exists(file_name):
+                download_file(url, file_name)
+        else:
+            raise Exception('No where to download package from')
+
+        _build_package(repo_dir, package_dir, package_toml, file_name, is_git)
     else:
         raise NotImplementedError
 
