@@ -59,8 +59,6 @@ def get_dependants(package):
         package_toml = toml.load(os.path.join(
             package_data_loc, filename))
 
-        # print(package_toml)
-
         if package in package_toml.get('dependencies', []):
             l.append(filename.split('.')[0])
 
@@ -112,14 +110,14 @@ def make_symlinks(package_toml, package_dir, link_warn=True):
 
             if os.path.isdir(ld):
                 for filename in os.listdir(ld):
-                    if shutil.which(filename.split('/')[-1]):
+                    if shutil.which(os.path.split(filename)[-1]):
                         raise FileExistsError
 
                     os.symlink(os.path.join(ld, filename),
                                os.path.join(toaster_loc, 'bin', filename))
     except FileExistsError:
         if link_warn:
-            secho("1 or more links already exist and were not linked.",
+            secho("1 or more links already exist and were not linked. You can force links using `toaster link --force package`",
                   fg='bright_black')
 
 
