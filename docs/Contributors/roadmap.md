@@ -18,9 +18,10 @@ A list of things to do (for contributors)
 - [ ] Document how bakeries work
 - [x] Properly implement dependencies
 - [x] Versioning support
+- [ ] Update all packages properly
 - [ ] External dependencies ("uses")
 - [ ] Document "homepage" option and "uses" option
-- [ ] Support building with URL
+- [x] Support building with URL
 - [ ] Make dependencies be diff for build/binary
 - [x] Dont link if already in path (or ask)
 - [ ] Link command
