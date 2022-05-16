@@ -72,7 +72,7 @@ cp $SOURCE_DIR/defaults/bakery.json ~/.toaster/bakery.json
 
 secho "${GREY}Making subdirectories...${RED}"
 cd ~/.toaster
-mkdir .cache apps bakery binaries bin packages package_data
+mkdir .cache apps bakery binaries bin packages package_data etc
 printf $RESET
 
 if [[ "$PATH" =~ (^|:)"$HOME/.toaster/bin"(:|$) ]]; then
