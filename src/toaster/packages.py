@@ -332,6 +332,10 @@ def install_package(package_name, ignore_dependencies=False):
             package_toml, 'dependencies', append_mode=True)
         )
 
+    for use in dependingonsys(package_toml, 'use', append_mode=True):
+        if not shutil.which(use):
+            raise Exception(f'Required dependency `{use}` was not found.')
+
     if 'binary' in package_toml['types']:
         download_url = dependingonsys(package_toml['binary'], 'url')
         package_dir = os.path.join(toaster_loc, 'binaries', package)
