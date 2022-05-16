@@ -21,7 +21,7 @@ A list of things to do (for contributors)
 - [x] Support building with URL
 - [x] Dont link if already in path (or ask)
 - [x] Toaster updater
-- [ ] Document how bakeries work
+- [x] Document how bakeries work
 - [ ] Update all packages properly
 - [ ] Safer package updates
 - [ ] External dependencies ("uses")
