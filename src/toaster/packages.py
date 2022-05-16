@@ -27,6 +27,7 @@ toaster_loc = where_is_toaster()
 
 # Package Info
 def get_info(package):
+    """Get info about a package. Returns a dictionary"""
     toml_loc = os.path.join(
         toaster_loc, 'package_data', f'{package}.toml')
 
@@ -103,7 +104,7 @@ def make_symlinks(package_toml, package_dir, link_warn=True):
     """Makes symlinks"""
     # Link package binaries to toaster/bin
     link_dirs = dependingonsys(
-        package_toml['binary'], 'link_dirs', append_mode=True) or ['bin']
+        package_toml, 'link_dirs', append_mode=True) or ['bin']
 
     try:
         for ld in link_dirs:
@@ -225,7 +226,7 @@ def _build_package(repo_dir, package_dir, package_toml, link_warn=True, update=F
 
     link_warn = True
 
-    make_symlinks(package_toml, package_dir, link_warn)
+    make_symlinks(package_toml['build'], package_dir, link_warn)
 
     os.chdir(wd)
 
@@ -247,7 +248,7 @@ def _install_binary(package, package_dir, file_name, package_toml):
 
     link_warn = True
 
-    make_symlinks(package_toml, package_dir, link_warn)
+    make_symlinks(package_toml['binary'], package_dir, link_warn)
 
 
 def install_package(package_name, ignore_dependencies=False):
