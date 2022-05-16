@@ -280,8 +280,8 @@ def update(packages, refresh):
             exit(1)
 
         if c[1]:
-            secho(':: System updates available, starting updates!',
-                  fg='bright_magenta')
+            secho('System updates available, starting updates!',
+                  fg='bright_green')
 
             r = sysupdates.all()
 
