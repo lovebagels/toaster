@@ -161,10 +161,14 @@ def info(packages):
             errecho(f'{package} could not be found.')
         else:
             secho(
-                f"::: {package_toml.get('name')} {package_toml.get('version', '')} :::", fg='bright_magenta')
+                f"::: {package_toml.get('name', package)} {package_toml.get('version', '')} :::", fg='bright_magenta')
 
-            secho(f"{package_toml.get('desc', 'No description.')}\n",
+            secho(f"{package_toml.get('desc', 'No description.')}",
                   fg='bright_black')
+
+            if package_toml.get('homepage'):
+                secho(f"Homepage: {package_toml.get('homepage', 'None')}\n",
+                      fg='bright_blue')
 
             # Version info
             secho(
