@@ -23,3 +23,7 @@ sh <(curl -L https://bagels.sh)
 ```bash
 sh <(curl -L https://uninstall.bagels.sh)
 ```
+
+## Docs
+
+View the docs at <https://docs.bagels.sh>
