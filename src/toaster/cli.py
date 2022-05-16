@@ -15,6 +15,7 @@ from packages import get_all_packages
 from packages import get_info as get_package_info
 from packages import install_package
 from packages import remove_package
+from packages import update_all_packages
 from packages import update_package
 from utils import echo
 from utils import errecho
@@ -264,7 +265,7 @@ def update(packages, refresh):
             ':: Updating packages...', fg='bright_magenta')
 
         try:
-            get_all_packages()
+            update_all_packages()
         except AlreadyInstalled:
             pass
 

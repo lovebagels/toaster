@@ -27,12 +27,15 @@ toaster_loc = where_is_toaster()
 
 
 # Package Info
-def get_info(package):
+def get_info(package, from_installed=True, from_bakery=True):
     """Returns a packages TOML file either installed or from a bakery."""
-    toml_loc = os.path.join(
-        toaster_loc, 'package_data', f'{package}.toml')
+    if from_installed:
+        toml_loc = os.path.join(
+            toaster_loc, 'package_data', f'{package}.toml')
 
-    if not os.path.exists(toml_loc):
+        from_bakery = False
+
+    if from_bakery:
         pkgs = get_all_packages()
         package_source = None
 
@@ -379,6 +382,21 @@ def install_package(package_name, ignore_dependencies=False):
         _build_package(repo_dir, package_dir, package_toml, file_name, is_git)
     else:
         raise NotImplementedError
+
+
+def update_all_packages():
+    """Update all packages"""
+    pkgs = get_all_packages()
+    package_source = None
+
+    for key in pkgs:
+        package = pkgs[key]
+        package_dir = get_package_loc()
+
+        try:
+            update_package()
+        except:
+            continue
 
 
 def update_package(package):
