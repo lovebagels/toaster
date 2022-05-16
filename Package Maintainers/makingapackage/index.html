@@ -202,12 +202,60 @@
       
       
         <label class="md-nav__link" for="__nav_2">
+          Bakery Maintainers
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Bakery Maintainers" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Bakery Maintainers
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Bakery%20Maintainers/makingabakery/" class="md-nav__link">
+        Making a Bakery
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
           Contributors
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Contributors" data-md-level="1">
-        <label class="md-nav__title" for="__nav_2">
+        <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
           Contributors
         </label>
@@ -246,18 +294,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_3">
+        <label class="md-nav__link" for="__nav_4">
           Package Maintainers
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Package Maintainers" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Package Maintainers
         </label>
@@ -330,6 +378,19 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#homepage" class="md-nav__link">
+    Homepage
+  </a>
+  
+    <nav class="md-nav" aria-label="Homepage">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
@@ -486,18 +547,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_4">
+        <label class="md-nav__link" for="__nav_5">
           Users
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Users" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
+        <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Users
         </label>
@@ -577,6 +638,19 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#homepage" class="md-nav__link">
+    Homepage
+  </a>
+  
+    <nav class="md-nav" aria-label="Homepage">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#license" class="md-nav__link">
@@ -748,9 +822,11 @@ types = ['binary', 'build'] # Possible values: 'binary', 'build', 'app'
 dependencies = ['python&gt;3.8', 'go']
 </code></pre>
 <h3 id="name-and-description">Name and Description</h3>
-<p>The first 2 things here are the name and description, which are pretty self-explanatory.</p>
+<p>The first 2 things here are the name (<code>name</code>) and description (<code>desc</code>), which are pretty self-explanatory.</p>
 <h3 id="version">Version</h3>
 <p>Next is the version and the version type. These can be any string, but we recommend using a semantic version number and having version_type either be <code>stable</code>, <code>development</code>, <code>prototype</code>,<code>beta</code>, <code>alpha</code>, or something along those lines</p>
+<h2 id="homepage">Homepage</h2>
+<p>A URL which has information about the package, can be anything.</p>
 <h3 id="license">License</h3>
 <p>The license is pretty self-explanatory and can also be anything, but make sure that users are able to understand what the license means</p>
 <h3 id="archs-macos">Archs (macOS)</h3>
