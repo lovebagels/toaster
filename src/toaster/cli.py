@@ -11,6 +11,7 @@ from bakery import refresh_bakeries
 from bakery import rm_bakery
 from click_aliases import ClickAliasedGroup
 from exceptions import *
+from packages import get_all_packages
 from packages import get_info as get_package_info
 from packages import install_package
 from packages import remove_package
@@ -242,12 +243,32 @@ def update(packages, refresh):
     if not packages:
         packages = ['all']
 
+    if 'toaster' in packages or 'all' in packages:
+        secho(
+            ':: Updating toaster...', fg='bright_magenta')
+
+        try:
+            update_toaster()
+        except NotFound:
+            errecho(
+                'Toaster source code is not in the standard location... you will need to manually update it!\n')
+        else:
+            secho('Toaster is now up to date! :)\n', fg='bright_green')
+
     # Update all
     if 'all' in packages:
         refresh_db()
+        echo('')
 
         secho(
             ':: Updating packages...', fg='bright_magenta')
+
+        try:
+            get_all_packages()
+        except AlreadyInstalled:
+            pass
+
+        secho('Packages are now up to date! :)\n', fg='bright_green')
 
         secho(
             ':: Checking for macOS updates...', fg='bright_magenta')
@@ -269,24 +290,10 @@ def update(packages, refresh):
                     'An error has occured while updating your system.')
                 exit(1)
         else:
-            secho('All up to date! :)', fg='bright_green')
+            secho('All up to date! :)\n', fg='bright_green')
 
         return
 
-    if 'toaster' in packages:
-        secho(
-            ':: Updating toaster...', fg='bright_magenta')
-
-        try:
-            update_toaster()
-        except NotFound:
-            errecho(
-                'Toaster source code is not in the standard location... you will need to manually update it!')
-            return
-
-        secho('Toaster is now up to date! :)', fg='bright_green')
-
-        return
     # Update packages
     if refresh:
         refresh_db(auto=True)
