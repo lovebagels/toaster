@@ -22,9 +22,9 @@ A list of things to do (for contributors)
 - [x] Dont link if already in path (or ask)
 - [x] Toaster updater
 - [x] Document how bakeries work
-- [ ] Update all packages properly
-- [ ] Safer package updates
-- [ ] External dependencies ("uses")
+- [x] Update all packages properly
+- [x] Safer package updates
+- [x] External dependencies ("uses")
 - [ ] Document using archive URLs for build
 - [ ] Document "uses" option
 - [ ] Make dependencies be diff for build/binary
