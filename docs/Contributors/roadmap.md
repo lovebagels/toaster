@@ -15,23 +15,25 @@ A list of things to do (for contributors)
 - [x] Binary updates
 - [x] Support other types of archives
 - [x] Document binaries
-- [ ] Document how bakeries work
 - [x] Properly implement dependencies
 - [x] Versioning support
-- [ ] Update all packages properly
-- [ ] External dependencies ("uses")
-- [ ] Document "homepage" option and "uses" option
+- [x] Document "homepage" option
 - [x] Support building with URL
-- [ ] Make dependencies be diff for build/binary
 - [x] Dont link if already in path (or ask)
-- [ ] Link command
-- [ ] Info command for bakeries
 - [x] Toaster updater
+- [ ] Document how bakeries work
+- [ ] Update all packages properly
+- [ ] Safer package updates
+- [ ] External dependencies ("uses")
+- [ ] Document using archive URLs for build
+- [ ] Document "uses" option
+- [ ] Make dependencies be diff for build/binary
+- [ ] Link/unlink command
+- [ ] Info command for bakeries
 - [ ] Clean up packages.py code
 - [ ] Clean up code in sysupdates.py
 - [ ] Implement hash checking
 - [ ] Check before installing that package supports platform
-- [ ] Safer package updates
 - [ ] Allow caching packages
 - [ ] Clean up any bad code/comments
 - [ ] Package and bakery info commands
