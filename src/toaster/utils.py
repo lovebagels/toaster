@@ -58,8 +58,9 @@ def _get_val_for_sys(d, item, system):
         if len(d[system]) > 0:
             i = d[system][0]
 
-    if item in i:
-        return i[item]
+    if i:
+        if item in i:
+            return i[item]
 
 
 def dependingonsys(d, item, append_mode=False):
