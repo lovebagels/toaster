@@ -6,19 +6,19 @@ YELLOW='\033[1;33m'
 MAGENTA='\033[1;35m'
 RESET='\033[0m' # No Color
 
+OS=$(uname)
+
 # Echo function
 # This is because `echo` doesnt work for colors on linux and `echo -e` which fixes it on linux makes mac echo the "-e" part
 secho() {
     printf "${*}\n"
 }
 
-# OS
-OS=$(uname)
-
 # Get the options
 download=true
-
-while getopts ":c" option; do
+allow_root=false
+confirm=true
+while getopts ":cry" option; do
     case $option in
     # c is an option which allows you to use toaster from whichever directory you are running this script from
     # this is intended mainly for developers as the repo may be either private or outdated
@@ -27,20 +27,37 @@ while getopts ":c" option; do
         download=false
         SOURCE_DIR=$PWD
         ;;
+    r)
+        allow_root=true
+        ;;
+    y)
+        confirm=false
+        ;;
     esac
 done
 
+if [[ "$allow_root" != true ]]; then
+    # Check if running as root
+    if [[ "${EUID:-${UID}}" == "0" ]]; then
+        secho "${RED}Please do not install toaster as root!${RESET}"
+        exit 1
+    fi
+fi
+
 # Check if toaster is already installed
-[ -d "$HOME/.toaster" ] && secho "${GREEN}Toaster is already installed! 🍞${RESET}" && exit
+[ -d "$HOME/.toaster" ] && secho "${GREEN}Toaster is already installed! 🍞${RESET}" && exit 1
 
 # The actual installler starts here
 secho "${GREEN}:: Welcome to the toaster installer! 🍞"
 secho ":: This script will download and install toaster and add it to your path${RESET}"
 secho "${GREY}Unless you otherwise specified, everything will be installed to $HOME/.toaster${RESET}\n"
-printf "${MAGENTA}Press enter to continue or Ctrl+C to cancel!${RESET}"
-read -p " "
 
-secho "${GREY}Making ~/.toaster directory...${RED}"
+if [[ "$confirm" == true ]]; then
+    printf "${MAGENTA}Press enter to continue or Ctrl+C to cancel!${RESET}"
+    read -p " "
+fi
+
+secho "${GREY}Making ~/.toaster directory...${RESET}"
 mkdir ~/.toaster
 
 # Download
@@ -54,6 +71,8 @@ else
 fi
 
 # Download/install dependencies
+secho "${GREEN}Downloading/installing dependencies...${RESET}"
+
 python3 -m pip install \
     GitPython \
     atomicwrites \
