@@ -29,9 +29,14 @@ toaster_loc = where_is_toaster()
 # Package Info
 def get_info(package, from_installed=True, from_bakery=True):
     """Returns a packages TOML file either installed or from a bakery."""
+    toml_loc = None
+
     if from_installed:
-        toml_loc = os.path.join(
+        l = os.path.join(
             toaster_loc, 'package_data', f'{package}.toml')
+
+        if os.path.exists(l):
+            toml_loc = l
 
         from_bakery = False
 
@@ -46,8 +51,14 @@ def get_info(package, from_installed=True, from_bakery=True):
         if not package_source:
             raise NotFound(package)
 
-        toml_loc = os.path.join(toaster_loc, 'bakery',
-                                package_source, package, f'{package}.toml')
+        l = os.path.join(toaster_loc, 'bakery',
+                         package_source, package, f'{package}.toml')
+
+        if os.path.exists(l):
+            toml_loc = l
+
+    if not toml_loc:
+        raise NotFound(package)
 
     return toml.load(toml_loc)
 
