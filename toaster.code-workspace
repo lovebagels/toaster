@@ -7,7 +7,10 @@
 		"path": "../toastercore"
 	},
 	{
-		"path": "../../../.toaster"
+		"path": "../toaster-git"
+	},
+	{
+		"path": "/Users/wl/.toaster"
 	}
 ],
   "settings": {
