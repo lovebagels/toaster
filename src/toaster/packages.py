@@ -37,8 +37,7 @@ def get_info(package, from_installed=True, from_bakery=True):
 
         if os.path.exists(l):
             toml_loc = l
-
-        from_bakery = False
+            from_bakery = False
 
     if from_bakery:
         pkgs = get_all_packages()
