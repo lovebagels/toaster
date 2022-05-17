@@ -390,17 +390,12 @@ def install_package(package_name, ignore_dependencies=False):
 
 def update_all_packages():
     """Update all packages"""
-    pkgs = get_all_packages()
-    package_source = None
-
-    for key in pkgs:
-        package = pkgs[key]
-        package_dir = get_package_loc()
-
-        try:
-            update_package()
-        except:
-            continue
+    for t in ['packages', 'binaries', 'apps']:
+        for package in os.listdir(os.path.join(toaster_loc, t)):
+            try:
+                update_package(package)
+            except:
+                continue
 
 
 def update_package(package):
