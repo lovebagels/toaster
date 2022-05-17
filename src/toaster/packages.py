@@ -249,8 +249,6 @@ def _build_package(repo_dir, package_dir, package_toml, file_name=None, is_git=T
                 cmd = cmdnew
 
             try:
-                subprocess.run(['ls'])
-
                 subprocess.run(cmd)
             except:
                 errecho(f'error running: {cmd}')
