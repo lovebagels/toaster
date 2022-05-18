@@ -4,6 +4,8 @@
 
 A simple package manager for macOS/Linux with support for binary packages and app bundles! (in addition to built packages)
 
+Toaster also runs on other UNIX-like systems (though unofficially)
+
 ## Features and Goals
 
 - Installable on latest macOS without installing any additional things (besides PIP packages)
