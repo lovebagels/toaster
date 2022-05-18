@@ -26,15 +26,17 @@ First in a package's TOML file is information like the name, version, license, d
 Here is an example of how this may look:
 
 ```toml
-name = 'example'
-desc = 'An example package.'
-version = '1.0.0'
-version_type = 'development'
-license = "MIT"
-archs = ['universal'] # Possible values: 'arm64', 'x86_64', 'universal'
-linux_archs = ['any'] # Possible values: 'any', 'x86_64'
-types = ['binary', 'build'] # Possible values: 'binary', 'build', 'app'
-dependencies = ['python>3.8', 'go']
+name = "Python"
+desc = "Python is a programming language that lets you work more quickly and integrate your systems more effectively."
+version = "3.10.4"
+version_type = "release"
+homepage = "https://www.python.org/"
+license = "PSF"
+archs = ["arm64", "x86_64"]
+linux_archs = ["any"]
+types = ["binary", "build"]
+dependencies = ['example', 'foo>=2.5']
+uses = ['bar']
 ```
 
 ### Name and Description (string `name` & string `desc`)
@@ -45,7 +47,7 @@ The first 2 things here are the name (`name`) and description (`desc`), which ar
 
 Next is the version and the version type. These can be any string, but we recommend using a semantic version number and having version_type either be `stable`, `development`, `prototype`,`beta`, `alpha`, or something along those lines
 
-## Homepage (string `homepage`)
+### Homepage (string `homepage`)
 
 A URL which has information about the package, can be anything.
 
