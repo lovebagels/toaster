@@ -187,7 +187,18 @@ def remove_package(package):
     if dependants:
         raise DependedOnError(package, dependants)
 
-    if 'build' in package_toml['types']:
+    if 'binary' in package_toml['types']:
+        if 'uninstall' in package_toml['binary']:
+            # Run scripts
+            if dependingonsys(package_toml['binary']['uninstall'], 'scripts', append_mode=True):
+                for cmd in dependingonsys(package_toml['binary']['uninstall'], 'scripts', append_mode=True):
+                    subprocess.run(cmd)
+
+            # Run "post_scripts"
+            if dependingonsys(package_toml['binary']['uninstall'], 'post_scripts', append_mode=True):
+                for cmd in dependingonsys(package_toml['binary']['uninstall'], 'post_scripts', append_mode=True):
+                    subprocess.run(cmd)
+    elif 'build' in package_toml['types']:
         if 'uninstall' in package_toml['build']:
             # Run scripts
             if dependingonsys(package_toml['build']['uninstall'], 'scripts', append_mode=True):
@@ -198,7 +209,6 @@ def remove_package(package):
             if dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
                 for cmd in dependingonsys(package_toml['build']['uninstall'], 'post_scripts', append_mode=True):
                     subprocess.run(cmd)
-
     if os.path.exists(package_dir):
         shutil.rmtree(package_dir)
 
@@ -317,6 +327,26 @@ def _install_binary(package, package_dir, file_name, package_toml, link_warn=Tru
     else:
         msg = f"Unknown archive type: {dependingonsys(package_toml['binary'], 'type')}"
         raise NotImplemented(msg)
+
+    os.chdir(package_dir)
+
+    # Run scripts
+    if dependingonsys(package_toml['binary'], 'scripts', append_mode=True):
+        for cmd in dependingonsys(package_toml['binary'], 'scripts', append_mode=True):
+            # Format scripts
+            if dependingonsys(package_toml['binary'], 'format_scripts'):
+                cmdnew = []
+
+                for i in cmd:
+                    cmdnew.append(
+                        i.format(prefix=package_dir))
+
+                cmd = cmdnew
+
+            try:
+                subprocess.run(cmd)
+            except:
+                errecho(f'error running: {cmd}')
 
     make_symlinks(package_toml['binary'], package_dir, link_warn)
 
