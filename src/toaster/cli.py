@@ -13,7 +13,9 @@ from click_aliases import ClickAliasedGroup
 from exceptions import *
 from packages import get_all_packages
 from packages import get_info as get_package_info
+from packages import get_package_loc
 from packages import install_package
+from packages import make_symlinks
 from packages import remove_package
 from packages import update_all_packages
 from packages import update_package
@@ -194,7 +196,7 @@ def info(packages):
 
 @cli.command(help='Install packages', group='Packages')
 @click.argument('packages', nargs=-1, required=True, type=str)
-@click.option('--refresh', help='Refresh Packages', default=True, type=bool)
+@click.option('--refresh', help='Refresh Packages', default=True)
 def install(packages, refresh):
     """Install a package"""
     if refresh:
@@ -238,7 +240,7 @@ def remove(packages):
 
 @cli.command(help='Update packages', group='Packages')
 @click.argument('packages', nargs=-1, type=str)
-@click.option('--refresh', help='Refresh Packages', default=True, type=bool)
+@click.option('--refresh', help='Refresh Packages', default=True)
 def update(packages, refresh):
     """Update a package"""
     if not packages:
@@ -317,6 +319,27 @@ def update(packages, refresh):
         else:
             secho(
                 f'{package} updated!', fg='bright_green')
+
+
+@cli.command(help='Link packages to your path', group='Packages')
+@click.argument('packages', nargs=-1, type=str)
+@click.option('--force/--no-force', help='Force packages to be linked', default=False)
+def link(packages, force):
+    for package in packages:
+        secho(
+            f':: Linking {package}...', fg='bright_magenta')
+
+        try:
+            package_toml = get_package_info(package, from_bakery=False)
+            package_dir = get_package_loc(package)
+        except NotFound:
+            errecho(f'{package} is not installed.')
+            return
+
+        make_symlinks(package_toml, package_dir, force=force)
+
+        secho(
+            f'Linked {package}!', fg='bright_green')
 
 
 if __name__ == '__main__':

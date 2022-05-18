@@ -112,7 +112,7 @@ def get_package_loc(package):
     raise NotFound(package)
 
 
-def make_symlinks(package_toml, package_dir, link_warn=True):
+def make_symlinks(package_toml, package_dir, link_warn=True, force=False):
     """Makes symlinks"""
     # Link package binaries to toaster/bin
     link_dirs = dependingonsys(
@@ -124,8 +124,12 @@ def make_symlinks(package_toml, package_dir, link_warn=True):
 
             if os.path.isdir(ld):
                 for filename in os.listdir(ld):
-                    if shutil.which(os.path.split(filename)[-1]):
-                        raise FileExistsError
+                    if not force:
+                        if shutil.which(os.path.split(filename)[-1]):
+                            raise FileExistsError
+
+                    if force:
+                        os.remove(os.path.join(toaster_loc, 'bin', filename))
 
                     os.symlink(os.path.join(ld, filename),
                                os.path.join(toaster_loc, 'bin', filename))
@@ -133,6 +137,23 @@ def make_symlinks(package_toml, package_dir, link_warn=True):
         if link_warn:
             secho("1 or more links already exist and were not linked. You can force links using `toaster link --force package`",
                   fg='bright_black')
+
+
+def remove_symlinks(package_toml, package_dir):
+    """Deletes symlinks"""
+    # Unlink package binaries to toaster/bin
+    link_dirs = dependingonsys(
+        package_toml, 'link_dirs', append_mode=True) or ['bin']
+
+    for ld in link_dirs:
+        ld = os.path.join(package_dir, ld)
+
+        if os.path.isdir(ld):
+            for filename in os.listdir(ld):
+                loc = os.path.join(toaster_loc, 'bin', filename)
+
+                if os.path.exists(loc):
+                    os.remove(loc)
 
 
 def clean_symlinks():
