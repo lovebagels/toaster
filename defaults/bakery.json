@@ -4,10 +4,6 @@
         "description":"Core toaster packages!",
         "maintainer":"wxllow",
         "repo":"https://github.com/wxllow/toaster-core",
-        "packages":[
-            "go",
-            "snakesay",
-            "example"
-        ]
+        "packages":[]
     }
 }
