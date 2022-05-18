@@ -27,7 +27,9 @@ A list of things to do (for contributors)
 - [x] External dependencies ("uses")
 - [x] Document "uses" option
 - [x] Link/unlink command
-- [ ] Document using archive URLs for build
+- [x] Document using archive URLs for build
+- [ ] Pretty "use" error messages
+- [ ] Support scripts in binaries
 - [ ] Link binaries/packages properly depending on type that was installed
 - [ ] Info command for bakeries
 - [ ] Clean up packages.py code
