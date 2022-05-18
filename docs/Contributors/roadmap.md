@@ -25,9 +25,7 @@ A list of things to do (for contributors)
 - [x] Update all packages properly
 - [x] Safer package updates
 - [x] External dependencies ("uses")
-- [ ] Document using archive URLs for build
-- [ ] Document "uses" option
-- [ ] Make dependencies be diff for build/binary
+- [x] Document "uses" option
 - [ ] Link/unlink command
 - [ ] Info command for bakeries
 - [ ] Clean up packages.py code
@@ -37,6 +35,8 @@ A list of things to do (for contributors)
 - [ ] Allow caching packages
 - [ ] Clean up any bad code/comments
 - [ ] Package and bakery info commands
+- [ ] Make dependencies be diff for build/binary
+- [ ] Document using archive URLs for build
 - [ ] *See **Making installer***
 - [ ] Once you're here, your hard work has paid off, so clean up any code and **add more packages duh :)**
 - [ ] **MILESTONE #1: Launch toaster alpha for macOS**

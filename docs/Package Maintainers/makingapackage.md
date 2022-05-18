@@ -75,6 +75,10 @@ This is where you specify which type(s) your package supports. This can be `buil
 
 Here is where you can place all the other packages you require to be installed to install your package. You can specify just a package's name, like `go`, or a minimum version to be required for the package, like `python>=3.7`.
 
+### Use
+
+Here is where you can put a list of commands not installable from toaster that are required to install your program.
+
 ## Binary
 
 Here is an example of a simple binary program's TOML file
