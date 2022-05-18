@@ -16,3 +16,17 @@ class AlreadyInstalled(Error):
 class NotFound(Error):
     """Raised when a package is not found"""
     pass
+
+
+class UseNotFound(Error):
+    """Raised when a use dependency is not found"""
+    pass
+
+
+class DependedOnError(Error):
+    def ___init__(self, message, dependants):
+        super().__init__(message)
+        self.msg = message
+        self.dependants = []
+
+    """Raised when a package cannot be removed because it is depended on by other packages"""

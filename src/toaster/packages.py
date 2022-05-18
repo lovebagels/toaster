@@ -73,7 +73,7 @@ def get_dependants(package):
         package_toml = toml.load(os.path.join(
             package_data_loc, filename))
 
-        if package in package_toml.get('dependencies', []):
+        if package in dependingonsys(package_toml, 'dependencies', append_mode=True):
             l.append(filename.split('.')[0])
 
     return l
@@ -84,14 +84,16 @@ def install_dependencies(dependencies, out=True):
     for dependency in dependencies:
         try:
             secho(f"Installing dependency: {dependency}", fg="bright_magenta")
-            install_package(dependency, ignore_dependencies=True)
+            install_package(dependency)
+
         except AlreadyInstalled as e:
             if out:
                 secho(
                     f'Dependency {dependency} is already installed, ignoring!', fg='bright_black')
-                return
 
-            raise e
+            return
+
+        secho(f'Installed dependency: {dependency}', fg="bright_magenta")
 
 
 def get_package_loc(package):
@@ -176,15 +178,16 @@ def remove_package(package):
         toaster_loc, 'package_data', f'{package}.toml')
 
     try:
-
         package_toml = toml.load(package_toml_loc)
     except FileNotFoundError:
         raise NotFound(package)
 
     dependants = get_dependants(package)
 
+    print(dependants)
+
     if dependants:
-        raise Exception(f'This package is depended on by {len(dependants)}!')
+        raise DependedOnError(package, dependants)
 
     if 'build' in package_toml['types']:
         if 'uninstall' in package_toml['build']:
@@ -365,7 +368,7 @@ def install_package(package_name, ignore_dependencies=False):
 
     for use in dependingonsys(package_toml, 'use', append_mode=True):
         if not shutil.which(use):
-            raise Exception(f'Required dependency `{use}` was not found.')
+            raise UseNotFound(use)
 
     if 'binary' in package_toml['types']:
         download_url = dependingonsys(package_toml['binary'], 'url')
