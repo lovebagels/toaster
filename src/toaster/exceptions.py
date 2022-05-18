@@ -24,9 +24,9 @@ class UseNotFound(Error):
 
 
 class DependedOnError(Error):
+    """Raised when a package cannot be removed because it is depended on by other packages"""
+
     def ___init__(self, message, dependants):
         super().__init__(message)
         self.msg = message
         self.dependants = []
-
-    """Raised when a package cannot be removed because it is depended on by other packages"""

@@ -217,6 +217,9 @@ def install(packages, refresh):
         except NotImplementedError:
             errecho(
                 f'{package} was found but is not available because it is a binary or app which is not supported yet.')
+        except UseNotFound as e:
+            errecho(
+                f'{package} requires the external dependency `{e}`, which could not be found!')
         else:
             secho(
                 f'{package} installed!', fg='bright_green')
@@ -232,9 +235,12 @@ def remove(packages):
         try:
             remove_package(package)
         except NotFound:
-            success = False
-            return errecho(f'{package} is not installed.')
-
+            errecho(f'{package} is not installed.')
+            return
+        except DependedOnError as e:
+            errecho(
+                f'{package} is depended on by {len(e.args[1])} packages!')
+            return
         secho(
             f'Removed {package}!', fg='bright_green')
 
