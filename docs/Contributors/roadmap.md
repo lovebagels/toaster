@@ -26,21 +26,22 @@ A list of things to do (for contributors)
 - [x] Safer package updates
 - [x] External dependencies ("uses")
 - [x] Document "uses" option
-- [ ] Link/unlink command
+- [x] Link/unlink command
+- [ ] Document using archive URLs for build
 - [ ] Link binaries/packages properly depending on type that was installed
 - [ ] Info command for bakeries
 - [ ] Clean up packages.py code
 - [ ] Clean up code in sysupdates.py
-- [ ] Implement hash checking
 - [ ] Check before installing that package supports platform
+- [ ] Implement hash checking
 - [ ] Allow caching packages
 - [ ] Clean up any bad code/comments
 - [ ] Package and bakery info commands
 - [ ] Make dependencies be diff for build/binary
-- [ ] Document using archive URLs for build
+- [ ] packages that "Always update" like git packages
 - [ ] *See **Making installer***
 - [ ] Once you're here, your hard work has paid off, so clean up any code and **add more packages duh :)**
-- [ ] **MILESTONE #1: Launch toaster alpha for macOS**
+- [ ] **MILESTONE #1: Launch toaster alpha**
 - [ ] **MILESTONE #2: Support "apps"**
 - [ ] *See **Making installer** once again*
 - [ ] Make sure Linux support works as expected
