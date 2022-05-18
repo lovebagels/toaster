@@ -37,31 +37,31 @@ types = ['binary', 'build'] # Possible values: 'binary', 'build', 'app'
 dependencies = ['python>3.8', 'go']
 ```
 
-### Name and Description
+### Name and Description (string `name` & string `desc`)
 
 The first 2 things here are the name (`name`) and description (`desc`), which are pretty self-explanatory.
 
-### Version
+### Version (string `version` & string `version_type`)
 
 Next is the version and the version type. These can be any string, but we recommend using a semantic version number and having version_type either be `stable`, `development`, `prototype`,`beta`, `alpha`, or something along those lines
 
-## Homepage
+## Homepage (string `homepage`)
 
 A URL which has information about the package, can be anything.
 
-### License
+### License (string `license`)
 
 The license is pretty self-explanatory and can also be anything, but make sure that users are able to understand what the license means
 
-### Archs (macOS)
+### Archs (macOS) (array `archs`)
 
 Here you can specify which architectures you wish to target on macOS, either `universal`, `arm64`, or `x86_64`
 
-### Archs (Linux)
+### Archs (Linux) (array `linux_archs`)
 
 Here, you can specify which architectures you wish to target on Linux... either `any` or `x86_64`
 
-### Types
+### Types (array `types`)
 
 This is where you specify which type(s) your package supports. This can be `build`, `binary`, or `app`
 
@@ -71,11 +71,11 @@ This is where you specify which type(s) your package supports. This can be `buil
 
 `app` means a GUI-only .app bundle ***(macOS only)***
 
-### Dependencies
+### Dependencies (array `dependencies`)
 
 Here is where you can place all the other packages you require to be installed to install your package. You can specify just a package's name, like `go`, or a minimum version to be required for the package, like `python>=3.7`.
 
-### Use
+### Use (array `use`)
 
 Here is where you can put a list of commands not installable from toaster that are required to install your program.
 
@@ -98,17 +98,17 @@ link_dirs = ['go/bin']
 
 ```
 
-### URL
+### URL (string `url`)
 
 First and most importantly is the URL. This is a file archive (`.zip`, `tar.gz`, etc.)
 
 This file is downloaded and then extracted to the package's directory
 
-### Type
+### Type (string `type`)
 
 This is the type of archive you specified in the URL. (`zip`, `gz`, `xz`, etc.)
 
-### Link Dirs
+### Link Dirs (bool `link_dirs`)
 
 List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to `['bin']`
 
@@ -134,19 +134,39 @@ link_dirs = ['bin']
         scripts = [['echo', 'bye bye, apple!']]
 ```
 
-### Repository
+### Git packages
+
+The first way to get a package is from a git repo, here are the following properties for that:
+
+#### Repository (string `repo`)
 
 The first two items here tell toaster which Git repo to download the source code from and which branch of that repo to use.
 
-### Format Scripts?
+#### Branch (string `branch`)
+
+This is just a string which specifies which branch from the git repo should be used. This will default to `master` if not specified.
+
+### Archives
+
+The second way to get a package is from an archive such as a `tar.gz` file, which should be downloaded.
+
+#### URL (string `url`)
+
+First and most importantly is the URL. This is a file archive (`.zip`, `tar.gz`, etc.)
+
+#### Type (string `type`)
+
+This is the type of archive you specified in the URL. (`zip`, `gz`, `xz`, etc.)
+
+### Format Scripts? (bool `format_scripts`)
 
 This is a boolean which tells toaster whether it should format scripts with things like {prefix} which contain data, such as where the package should be installed, in the case of {prefix}.
 
-### Link dirs
+### Link dirs (array `link_dirs`)
 
 List of directorys that you wish to be linked to PATH after installation. Paths are relative to the package directory ({prefix}). Defaults to `['bin']`
 
-### Scripts
+### Scripts (array `scripts`)
 
 These are scripts to run during installation **in the temp directory with the package's source code**.
 
@@ -154,7 +174,7 @@ This could be things like `./configure --prefix {prefix}`
 
 This should be a list containing commands to run. Commands should also be a list, seperated by their arguments. For example, `[['./configure', '--prefix {prefix}'], ['make', 'install']]`. This is for security reasons. If you have experience with for example the subprocess library on Python, you are likely already be familiar with this.
 
-### Post-scripts
+### Post-scripts  (array `post_scripts`)
 
 These are scripts that are run right before installation is finished and are ran in the project directory. These work the same as regular scripts, just ran at a different time and in a different directory.
 
