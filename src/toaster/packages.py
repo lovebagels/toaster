@@ -128,11 +128,13 @@ def make_symlinks(package_toml, package_dir, link_warn=True, force=False):
                         if shutil.which(os.path.split(filename)[-1]):
                             raise FileExistsError
 
-                    if force:
-                        os.remove(os.path.join(toaster_loc, 'bin', filename))
+                    link_loc = os.path.join(toaster_loc, 'bin', filename)
 
-                    os.symlink(os.path.join(ld, filename),
-                               os.path.join(toaster_loc, 'bin', filename))
+                    if force:
+                        if os.path.exists(link_loc):
+                            os.remove(link_loc)
+
+                    os.symlink(os.path.join(ld, filename), link_loc)
     except FileExistsError:
         if link_warn:
             secho("1 or more links already exist and were not linked. You can force links using `toaster link --force package`",

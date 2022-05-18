@@ -17,6 +17,7 @@ from packages import get_package_loc
 from packages import install_package
 from packages import make_symlinks
 from packages import remove_package
+from packages import remove_symlinks
 from packages import update_all_packages
 from packages import update_package
 from utils import echo
@@ -340,6 +341,26 @@ def link(packages, force):
 
         secho(
             f'Linked {package}!', fg='bright_green')
+
+
+@cli.command(help='Unlink packages from your path', group='Packages')
+@click.argument('packages', nargs=-1, type=str)
+def unlink(packages):
+    for package in packages:
+        secho(
+            f':: Uninking {package}...', fg='bright_magenta')
+
+        try:
+            package_toml = get_package_info(package, from_bakery=False)
+            package_dir = get_package_loc(package)
+        except NotFound:
+            errecho(f'{package} is not installed.')
+            return
+
+        remove_symlinks(package_toml, package_dir)
+
+        secho(
+            f'Unlinked {package}!', fg='bright_green')
 
 
 if __name__ == '__main__':
