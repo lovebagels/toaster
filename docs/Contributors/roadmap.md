@@ -27,6 +27,7 @@ A list of things to do (for contributors)
 - [x] External dependencies ("uses")
 - [x] Document "uses" option
 - [ ] Link/unlink command
+- [ ] Link binaries/packages properly depending on type that was installed
 - [ ] Info command for bakeries
 - [ ] Clean up packages.py code
 - [ ] Clean up code in sysupdates.py
