@@ -184,8 +184,6 @@ def remove_package(package):
 
     dependants = get_dependants(package)
 
-    print(dependants)
-
     if dependants:
         raise DependedOnError(package, dependants)
 
