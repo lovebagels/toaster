@@ -62,13 +62,23 @@ install_dependencies() {
         secho "${MAGENTA}Pacman was detected, checking if you have required packages..."
 
         if ! pacman -Qi gcc git >&/dev/null; then
-            echo "${RED}You are missing required system packages! Please install $(base-devel) via pacman."
+            secho "${RED}You are missing required system packages! Please install $(base-devel) via pacman."
             exit 1
         fi
 
         if ! pacman -Qi python3 python-pip >&/dev/null; then
-            echo "${RED}You are missing Python 3 and/or PIP, which are required to run toaster.\nPlease install $(python3) and $(python-pip) via pacman!"
+            secho "${RED}You are missing Python 3 and/or PIP, which are required to run toaster.\nPlease install $(python3) and $(python-pip) via pacman!"
         fi
+    fi
+
+    if [ "$OS" == "Darwin" ]; then
+        # Check for Xcode cli tools
+        if ! xcode-select -p >&/dev/null; then
+            secho "${GREEN}Installing Xcode Command Line Tools..."
+            xcode-select --install
+        fi
+
+        secho "${GREEN}"
     fi
 }
 
@@ -83,10 +93,6 @@ if [[ "$confirm" == true ]]; then
 fi
 
 install_dependencies
-
-if [[ "$confirm" == true ]]; then
-    read -p " "
-fi
 
 secho "${GREY}Making ~/.toaster directory..."
 mkdir ~/.toaster
