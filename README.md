@@ -13,6 +13,7 @@ Toaster also runs on other UNIX-like systems (though unofficially)
 - Store everything in a user directory (so no need to use root)
 - Don't store extra cache that isn't needed (unless the user specifies that)
 - Manages system updates on macOS
+- Don't bloat users storage with unnecessary caching, only cache what's needed.
 
 ## Install
 
